@@ -1,9 +1,9 @@
 metadata    :name        => "package",
-            :description => "Install and uninstall software packages",
-            :author      => "R.I.Pienaar",
-            :license     => "ASL 2.0",
+            :description => "Manage Operating System Packages",
+            :author      => "R.I.Pienaar <rip@devco.net>",
+            :license     => "Apache-2.0",
             :version     => "4.7.0",
-            :url         => "https://github.com/puppetlabs/mcollective-package-agent",
+            :url         => "https://github.com/choria-plugins/package-agent",
             :timeout     => 180
 
 requires :mcollective => "2.2.1"

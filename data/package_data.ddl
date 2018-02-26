@@ -1,10 +1,10 @@
-metadata :name => "package",
+metadata :name        => "package",
          :description => "Checks the status of a package",
-         :author => "R.I.Pienaar",
-         :license => "ASL 2.0",
-         :version => "4.7.0",
-         :url => "https://github.com/puppetlabs/mcollective-package-agent",
-         :timeout => 3
+         :author      => "R.I.Pienaar <rip@devco.net>",
+         :license     => "Apache-2.0",
+         :version     => "4.7.0",
+         :url         => "https://github.com/choria-plugins/package-agent",
+         :timeout     => 3
 
 requires :mcollective => "2.2.1"
 
