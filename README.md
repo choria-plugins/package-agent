@@ -1,17 +1,15 @@
-# Package Agent
+# Choria Package Agent
 
 The package agent that lets you install, uninstall, update, purge and query the status of packages on your system.
 
 The package agent does not do any management of packages itself. Instead it
-uses the functionality defined in MCollective::Util::Package classes to
+uses the functionality defined in `MCollective::Util::Package` classes to
 perform the actions. By default the Package agent ships with a PuppetPackage
-util class, but creating your own is as simple as adding a new class to
-util/package/ and implementing the #install, #uninstall, #purge, #update and #status
-methods.
+but it's extendable for your own scenarios.
 
 ## Installation
 
-Follow the [basic plugin install guide](https://docs.puppetlabs.com/mcollective/deploy/plugins.html).
+This agent is installed by default as part of the [Choria Orchestrator](https://choria.io).
 
 ## Configuration
 
@@ -21,12 +19,10 @@ There is one plugin configuration setting for the package agent.
 
 General provider configuration options can then also be set in the config file.
 
-```
-plugin.package.provider = puppet
-
-# Puppet provider specific options
-plugin.package.puppet.allowcdrom = true
-
+```yaml
+mcollective_agent_package::config:
+  provider: puppet
+  puppet.allowcdrom: true
 ```
 
 ## Usage
@@ -98,19 +94,13 @@ method of package management you can do so by providing your own backend
 provider for this agent.
 
 The logic for the Puppet version of this agent is implemented in
-Util::Package::PuppetPackage, you can create a custom package implementation
-that overrides #install, #uninstall, #update, #purge and #status.
+`Util::Package::PuppetPackage`, you can create a custom package implementation
+that overrides `#install`, `#uninstall`, `#update`, `#purge` and `#status`.
 
-This agent defaults to Util::Package::PuppetPackage but if you have your own
+This agent defaults to `Util::Package::PuppetPackage` but if you have your own
 you can configure it in the config file using:
 
+```yaml
+mcollective_agent_package::config:
+  provider: puppet
 ```
-plugin.package.provider = puppet
-```
-
-## Maintenance
-
-Maintainers: Alessandro Parisi <alessandro@puppet.com>, Michael Smith
-<michael.smith@puppet.com>, Michal Ruzicka <michal.ruzicka@puppet.com>.
-
-Tickets: File bug tickets at https://tickets.puppet.com/browse/MCOP.
