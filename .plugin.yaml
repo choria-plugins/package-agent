@@ -1,0 +1,6 @@
+mcollective_agent_package::policies:
+  - action: "allow"
+    callers: "*"
+    actions: "status count md5"
+    facts: "*"
+    classes: "*"

@@ -25,6 +25,27 @@ mcollective_agent_package::config:
   puppet.allowcdrom: true
 ```
 
+## Authorization
+
+By default the Action Policy system is configured to only allow `status` and `count` and `md5`
+actions from all users.  These are read only and does not expose secrets.
+
+Follow the Choria documentation to configure your own policies either site wide or per agent.
+
+If you do configure any Policies specific to this module these defaults will be overriden
+when done using Hiera.
+
+An example policy can be seen here:
+
+```yaml
+mcollective_agent_package::policies:
+  - action: "allow"
+    callers: "choria=manager.mcollective"
+    actions: "install update uninstall purge"
+    facts: "*"
+    classes: "*"
+```
+
 ## Usage
 ```
 % mco rpc package install package=nano
