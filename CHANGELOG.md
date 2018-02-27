@@ -1,6 +1,13 @@
 # Changelog
 
-Change history for mcollective-package.
+Change history for `choria/mcollective_agent_package`
+
+## 5.0.0
+
+Released 2018-02-27
+
+* Add default action policies (1)
+* Fork from Puppet Inc
 
 ## 4.7.0
 
