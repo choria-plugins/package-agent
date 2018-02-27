@@ -1,11 +1,12 @@
 # Choria Package Agent
 
-The package agent that lets you install, uninstall, update, purge and query the status of packages on your system.
+The package agent that lets you install, uninstall, update, purge and query the
+status of packages on your system.
 
-The package agent does not do any management of packages itself. Instead it
-uses the functionality defined in `MCollective::Util::Package` classes to
-perform the actions. By default the Package agent ships with a PuppetPackage
-but it's extendable for your own scenarios.
+This agent can be extended to support different Package managers, by default it
+uses Puppet.  See the section later in this document about extendibility.
+
+<!--- actions -->
 
 ## Installation
 
@@ -125,3 +126,6 @@ you can configure it in the config file using:
 mcollective_agent_package::config:
   provider: puppet
 ```
+
+There is an example `YumPackage` that manages YUM based systems without Puppet
+that you can look to for an example.
