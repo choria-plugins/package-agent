@@ -88,7 +88,7 @@ module MCollective
       #
       #   plugin.package.my_provider.x = y
       #
-      # which will then be resturned as
+      # which will then be returned as
       #
       #   {:x => 'y'}
       #
@@ -108,7 +108,7 @@ module MCollective
         provider_options
       end
 
-      # Loads the requires package provider and calls the method that
+      # Loads the required package provider and calls the method that
       # corresponds to the supplied action. The third arugment is an
       # in-out variable used to update the reply values in the case of
       # agents, and the value hash in the case of data plugins.
@@ -142,7 +142,7 @@ module MCollective
         reply[:package_manager] = result[:package_manager]
       end
 
-      #Loads and returns the package_helper class
+      # Loads and returns the package_helper class
       def package_helper
         PluginManager.loadclass('MCollective::Util::Package::PackageHelpers')
         Util::Package.const_get('PackageHelpers')
