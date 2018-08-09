@@ -94,7 +94,8 @@ END_OF_USAGE
                 if configuration[:action] == 'status'
                   puts(pattern % [result[:sender], result[:data][:ensure]])
                 elsif ['yum_checkupdates', 'apt_update', 'checkupdates', 'apt_checkupdates'].include?(configuration[:action])
-                  puts(pattern % [result[:sender], result[:data][:outdated_packages]])
+                  status = result[:data][:outdated_packages].map{ |package| "%s-%s" % package[:package], package[:version] }.join(' ')
+                  puts(pattern % [result[:sender], status])
                 else
                   puts(pattern % [result[:sender], result[:data][:output]])
                 end
