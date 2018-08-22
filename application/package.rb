@@ -91,13 +91,13 @@ END_OF_USAGE
           pkg_result.each do |result|
             if result[:statuscode] == 0
               if pkg.verbose
-                if configuration[:action] == 'status'
-                  puts(pattern % [result[:sender], result[:data][:ensure]])
+                if ['count', 'md5'].include?(configuration[:action])
+                  puts(pattern % [result[:sender], result[:data][:output]])
                 elsif ['yum_checkupdates', 'apt_update', 'checkupdates', 'apt_checkupdates'].include?(configuration[:action])
                   status = result[:data][:outdated_packages].map{ |package| "%s-%s" % [package[:package], package[:version]] }.join(' ')
                   puts(pattern % [result[:sender], status])
                 else
-                  puts(pattern % [result[:sender], result[:data][:output]])
+                  puts(pattern % [result[:sender], result[:data][:ensure]])
                 end
               else
                 if configuration[:action] == 'status'
