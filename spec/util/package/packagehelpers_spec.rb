@@ -76,15 +76,17 @@ module MCollective
 
           it 'should perform the update' do
             File.expects(:exists?).with('/usr/bin/apt-get').returns(true)
+            File.expects(:exists?).with('/usr/bin/apt-get').returns(true)
             shell = mock
             status = mock
             shell.stubs(:runcommand)
             shell.stubs(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
             Shell.expects(:new).with('/usr/bin/apt-get update', :stdout => "").returns(shell)
+            Shell.stubs(:new).with('/usr/bin/apt-get --simulate dist-upgrade', :stdout => "").returns(shell)
 
             result = PackageHelpers.apt_update
-            result.should == {:exitcode => 0, :output => ""}
+            result.should == {:exitcode => 0, :output => "", :outdated_packages => [], :package_manager => "apt"}
           end
 
         end

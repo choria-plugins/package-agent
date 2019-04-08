@@ -107,7 +107,10 @@ module MCollective
           result[:exitcode] = cmd.status.exitstatus
 
           raise "apt-get update failed, exit code was #{result[:exitcode]}" unless result[:exitcode] == 0
-          return result
+
+          # Everything was fine.  Discard the current result and return the
+          # actual status of the system.
+          return apt_checkupdates
         end
 
         def self.packagemanager

@@ -163,6 +163,10 @@ action "apt_update", :description => "Update the apt cache" do
            :description => "Output from apt-get",
            :display_as  => "Output"
 
+    output :outdated_packages,
+           :description => "Outdated packages",
+           :display_as  => "Outdated Packages"
+
     output :exitcode,
            :description => "The exitcode from the apt-get command",
            :display_as => "Exit Code"

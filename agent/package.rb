@@ -45,6 +45,7 @@ module MCollective
         result = package_helper.apt_update
         reply[:exitcode] = result[:exitcode]
         reply[:output] = result[:output]
+        reply[:outdated_packages] = result[:outdated_packages]
       end
 
       action 'checkupdates' do
