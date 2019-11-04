@@ -66,6 +66,31 @@ requires :mcollective => "2.2.1"
     end
 end
 
+action "search", :description => "Search package manager for package availability" do
+    display :always
+
+    input :package,
+          :prompt      => "Package Name",
+          :description => "Package to search for, either name, glob, or package spec",
+          :type        => :string,
+          :validation  => :shellsafe,
+          :optional    => false,
+          :maxlength   => 90
+
+    output :package_count,
+           :description => "Number of packages available",
+           :display_as  => "Number of Packages Available"
+
+    output :available_packages,
+           :description => "Available packages",
+           :display_as  => "Available Packages"
+
+    summarize do
+       aggregate summary(:package_count)
+    end
+
+end
+
 action "status", :description => "Get the status of a package" do
     display :always
 

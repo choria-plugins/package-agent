@@ -157,21 +157,21 @@ module MCollective
 
         describe "rpm_count" do
           it 'should raise if rpm cannot be found on the system' do
-            File.expects(:exists?).with('/usr/bin/rpm').returns(false)
+            File.expects(:exists?).with('/bin/rpm').returns(false)
 
             expect{
               PackageHelpers.rpm_count
-            }.to raise_error 'Cannot find rpm at /usr/bin/rpm'
+            }.to raise_error 'Cannot find rpm at /bin/rpm'
           end
 
           it 'should raise if the rpm command failed' do
-            File.expects(:exists?).with('/usr/bin/rpm').returns(true)
+            File.expects(:exists?).with('/bin/rpm').returns(true)
             shell = mock
             status = mock
             shell.stubs(:runcommand)
             shell.stubs(:status).returns(status)
             status.stubs(:exitstatus).returns(-1)
-            Shell.expects(:new).with('/usr/bin/rpm -qa', :stdout => "").returns(shell)
+            Shell.expects(:new).with('/bin/rpm -qa', :stdout => "").returns(shell)
 
             expect{
               PackageHelpers.rpm_count
@@ -184,10 +184,10 @@ module MCollective
                       package2 2.2.2.el7.noarch
                       package3 3.3.3.el7.x86_64"
 
-            File.expects(:exists?).with('/usr/bin/rpm').returns(true)
+            File.expects(:exists?).with('/bin/rpm').returns(true)
             shell = mock
             status = mock
-            Shell.stubs(:new).with('/usr/bin/rpm -qa', :stdout => output).returns(shell)
+            Shell.stubs(:new).with('/bin/rpm -qa', :stdout => output).returns(shell)
             shell.stubs(:runcommand)
             shell.stubs(:stdout).returns(output)
             shell.expects(:status).returns(status)
@@ -200,21 +200,21 @@ module MCollective
 
         describe "rpm_md5" do
           it 'should raise if rpm cannot be found on the system' do
-            File.expects(:exists?).with('/usr/bin/rpm').returns(false)
+            File.expects(:exists?).with('/bin/rpm').returns(false)
 
             expect{
               PackageHelpers.rpm_md5
-            }.to raise_error 'Cannot find rpm at /usr/bin/rpm'
+            }.to raise_error 'Cannot find rpm at /bin/rpm'
           end
 
           it 'should raise if the rpm command failed' do
-            File.expects(:exists?).with('/usr/bin/rpm').returns(true)
+            File.expects(:exists?).with('/bin/rpm').returns(true)
             shell = mock
             status = mock
             shell.stubs(:runcommand)
             shell.stubs(:status).returns(status)
             status.stubs(:exitstatus).returns(-1)
-            Shell.expects(:new).with('/usr/bin/rpm -qa', :stdout => "").returns(shell)
+            Shell.expects(:new).with('/bin/rpm -qa', :stdout => "").returns(shell)
 
             expect{
               PackageHelpers.rpm_md5
@@ -227,10 +227,10 @@ module MCollective
                       package2 2.2.2.el7.noarch
                       package3 3.3.3.el7.x86_64"
 
-            File.expects(:exists?).with('/usr/bin/rpm').returns(true)
+            File.expects(:exists?).with('/bin/rpm').returns(true)
             shell = mock
             status = mock
-            Shell.stubs(:new).with('/usr/bin/rpm -qa', :stdout => output).returns(shell)
+            Shell.stubs(:new).with('/bin/rpm -qa', :stdout => output).returns(shell)
             shell.stubs(:runcommand)
             shell.stubs(:stdout).returns(output)
             shell.expects(:status).returns(status)

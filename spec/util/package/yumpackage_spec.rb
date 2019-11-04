@@ -40,6 +40,14 @@ module MCollective
           end
         end
 
+        describe "#search" do
+          it "should delegate to call_action" do
+            package.expects(:call_action).with(:search).returns("search output")
+
+            package.search.should == "search output"
+          end
+        end
+
         describe '#call_action' do
           let(:status)  { mock('status') }
           let(:command) do
