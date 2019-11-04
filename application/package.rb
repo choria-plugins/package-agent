@@ -19,6 +19,7 @@ The ACTION can be one of the following:
     md5              - determine md5 of package list
     yum_clean        - clean the yum cache
     yum_checkupdates - display available updates from yum
+    yum_isavailable  - see if package is available to yum
     apt_update       - update all available packages
     apt_checkupdates - display available updates from apt
     checkupdates     - display available updates
@@ -44,12 +45,12 @@ END_OF_USAGE
       end
 
       def post_option_parser(configuration)
-        valid_global_actions = ['count', 'md5', 'yum_clean', 'yum_checkupdates', 'apt_update', 'checkupdates', 'apt_checkupdates']
+        valid_global_actions = %w[count md5 yum_clean yum_checkupdates yum_isavailable apt_update checkupdates apt_checkupdates]
         if (ARGV.size < 2) and !valid_global_actions.include?(ARGV[0])
           handle_message(:raise, 1)
         else
 
-          valid_actions = ['install', 'uninstall', 'purge', 'update', 'status'].concat(valid_global_actions)
+          valid_actions = %w[install uninstall purge update status].concat(valid_global_actions)
 
           if valid_actions.include?(ARGV[0])
             configuration[:action] = ARGV.shift
@@ -66,7 +67,7 @@ END_OF_USAGE
       end
 
       def validate_configuration(configuration)
-        unless [ 'status', 'count', 'md5'].include?(configuration[:action])
+        unless %w[status count md5].include?(configuration[:action])
           if Util.empty_filter?(options[:filter]) && !configuration[:yes]
             handle_message(:print, 3)
 
@@ -91,9 +92,12 @@ END_OF_USAGE
           pkg_result.each do |result|
             if result[:statuscode] == 0
               if pkg.verbose
-                if ['count', 'md5'].include?(configuration[:action])
+                if %w[yum_isavailable].include?(configuration[:action])
+                  puts(result[:data][:output])
+
+                elsif %w[count md5].include?(configuration[:action])
                   puts(pattern % [result[:sender], result[:data][:output]])
-                elsif ['yum_checkupdates', 'apt_update', 'checkupdates', 'apt_checkupdates'].include?(configuration[:action])
+                elsif %w[yum_checkupdates apt_update checkupdates apt_checkupdates].include?(configuration[:action])
                   status = result[:data][:outdated_packages].map{ |package| "%s-%s" % [package[:package], package[:version]] }.join(' ')
                   puts(pattern % [result[:sender], status])
                 else
@@ -108,10 +112,10 @@ END_OF_USAGE
                   end
                   puts(pattern % [result[:sender], status])
                 else
-                  if ['count', 'md5'].include?(configuration[:action])
+                  if %w[count md5].include?(configuration[:action])
                     status = "%s" % [result[:data][:output]]
                     puts(pattern % [result[:sender], status])
-                  elsif ['yum_checkupdates', 'apt_update', 'checkupdates', 'apt_checkupdates'].include?(configuration[:action])
+                  elsif %w[yum_checkupdates apt_update checkupdates apt_checkupdates].include?(configuration[:action])
                     status = result[:data][:outdated_packages].map{ |package| package[:package] }.join(' ')
                     puts(pattern % [result[:sender], status])
                   end

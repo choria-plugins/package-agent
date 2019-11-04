@@ -36,7 +36,7 @@ module MCollective
 
           expect{
             @app.post_option_parser({})
-          }.to raise_error 'Action has to be one of install, uninstall, purge, update, status, count, md5, yum_clean, yum_checkupdates, apt_update, checkupdates, apt_checkupdates'
+          }.to raise_error 'Action has to be one of install, uninstall, purge, update, status, count, md5, yum_clean, yum_checkupdates, yum_isavailable, apt_update, checkupdates, apt_checkupdates'
         end
 
         it 'should parse "action" "package" correctly' do

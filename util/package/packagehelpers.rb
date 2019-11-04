@@ -97,6 +97,32 @@ module MCollective
           return result
         end
 
+        def self.yum_isavailable(package, version)
+          raise "Cannot find yum at /usr/bin/yum" unless File.exists?("/usr/bin/yum")
+          result = {:exitcode => nil,
+                    :output => ""}
+
+          if version.nil?
+            cmd = Shell.new(
+              "/usr/bin/yum list -q #{package}",
+              :stdout => result[:output]
+            )
+          else
+            # If we specify the version, but the package would be downgraded, the information
+            # won't show without passing in --showduplicates
+            cmd = Shell.new(
+              "/usr/bin/yum list -q --showduplicates #{package}-#{version}",
+              :stdout => result[:output]
+            )
+          end
+
+          cmd.runcommand
+          result[:exitcode] = cmd.status.exitstatus
+
+          raise "Error: No matching Packages to list" unless result[:exitcode] == 0
+          return result
+        end
+
         def self.apt_update
           raise 'Cannot find apt-get at /usr/bin/apt-get' unless File.exists?('/usr/bin/apt-get')
           result = {:exitcode => nil,

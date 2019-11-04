@@ -41,6 +41,14 @@ module MCollective
         reply[:output] = result[:output]
       end
 
+      action 'yum_isavailable' do
+        package = request[:package]
+        version = request[:version]
+        result = package_helper.yum_isavailable(package, version)
+        reply[:exitcode] = result[:exitcode]
+        reply[:output] = result[:output]
+      end
+
       action 'apt_update' do
         result = package_helper.apt_update
         reply[:exitcode] = result[:exitcode]

@@ -158,6 +158,25 @@ action "yum_clean", :description => "Clean the YUM cache" do
            :display_as => "Exit Code"
 end
 
+action "yum_isavailable", :description => "Report if a package is available to yum list" do
+    input :package,
+          :prompt      => "Package Name",
+          :description => "Package to retrieve information of, like mcollective-1.0",
+          :type        => :string,
+          :validation  => :shellsafe,
+          :optional    => false,
+          :maxlength   => 90
+
+    output :output,
+           :description => "Output from the package manager",
+           :display_as  => "Output"
+
+    output :exitcode,
+           :description => "The exitcode from the yum command",
+           :display_as  => "Exit Code"
+end
+
+
 action "apt_update", :description => "Update the apt cache" do
     output :output,
            :description => "Output from apt-get",
