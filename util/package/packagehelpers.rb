@@ -17,10 +17,10 @@ module MCollective
         end
 
         def self.rpm_count(output = "")
-          raise "Cannot find rpm at /usr/bin/rpm" unless File.exists?("/usr/bin/rpm")
+          raise "Cannot find rpm at /bin/rpm" unless File.exists?("/bin/rpm")
           result = {:exitcode => nil,
                     :output => ""}
-          cmd = Shell.new("/usr/bin/rpm -qa", :stdout => output)
+          cmd = Shell.new("/bin/rpm -qa", :stdout => output)
           cmd.runcommand
           result[:exitcode] = cmd.status.exitstatus
           result[:output] = output.split("\n").select{ |line| line != "" }.size.to_s
@@ -55,10 +55,10 @@ module MCollective
 
 
         def self.rpm_md5(output = "")
-          raise "Cannot find rpm at /usr/bin/rpm" unless File.exists?("/usr/bin/rpm")
+          raise "Cannot find rpm at /bin/rpm" unless File.exists?("/bin/rpm")
           result = {:exitcode => nil,
                     :output => ""}
-          cmd = Shell.new("/usr/bin/rpm -qa", :stdout => output)
+          cmd = Shell.new("/bin/rpm -qa", :stdout => output)
           cmd.runcommand
           result[:exitcode] = cmd.status.exitstatus
           result[:output] = Digest::MD5.new.hexdigest(output)

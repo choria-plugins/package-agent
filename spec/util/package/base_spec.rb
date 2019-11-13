@@ -54,6 +54,14 @@ module MCollective
             }.to raise_error 'error. MCollective::Util::Package::Base does not implement #status'
           end
         end
+
+        describe 'search' do
+          it 'should raise an error if called' do
+            expect{
+              base.search
+            }.to raise_error 'error. MCollective::Util::Package::Base does not implement #search'
+          end
+        end
       end
     end
   end
