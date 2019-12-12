@@ -138,7 +138,8 @@ USAGE
                   if result[:data][:ensure] == "absent"
                     status = "absent"
                   else
-                    status = '%s-%s.%s' % [result[:data][:name], result[:data][:ensure], result[:data][:arch]]
+                    status = '%s-%s' % [result[:data][:name], result[:data][:ensure]]
+                    status += ".#{result[:data][:arch]}" if result[:data][:arch]
                   end
                   puts(pattern % [result[:sender], status])
                 else
