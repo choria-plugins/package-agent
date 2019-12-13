@@ -135,10 +135,12 @@ USAGE
                 end
               else
                 if configuration[:action] == "status"
-                  if result[:data][:ensure] == "absent"
-                    status = "absent"
+                  case result[:data][:ensure]
+                  when "absent", "purged"
+                    status = result[:data][:ensure]
                   else
-                    status = '%s-%s.%s' % [result[:data][:name], result[:data][:ensure], result[:data][:arch]]
+                    status = '%s-%s' % [result[:data][:name], result[:data][:ensure]]
+                    status += ".#{result[:data][:arch]}" if result[:data][:arch]
                   end
                   puts(pattern % [result[:sender], status])
                 else
