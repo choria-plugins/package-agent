@@ -11,6 +11,8 @@ module MCollective
             return rpm_count
           elsif manager == :apt
             return dpkg_count
+          elsif manager == :entropy
+            return entropy_count
           else
             raise 'Cannot find a compatible package system to count packages'
           end
@@ -42,12 +44,28 @@ module MCollective
           return result
         end
 
+        def self.entropy_count(output = '')
+          raise 'Cannot find equo at /usr/bin/equo' unless File.exists?('/usr/bin/equo')
+
+          result = {exitcode: nil,
+                    output: ''}
+          cmd = Shell.new('/usr/bin/equo query list installed --quiet', stdout: output)
+          cmd.runcommand
+          result[:exitcode] = cmd.status.exitstatus
+          result[:output] = output.split("\n").size.to_s
+
+          raise "equo query list installed failed, exit code was #{result[:exitcode]}" unless result[:exitcode].zero?
+          result
+        end
+
         def self.md5
           manager = packagemanager
           if manager == :yum
             return rpm_md5
           elsif manager == :apt
             return dpkg_md5
+          elsif manager == :entropy
+            return entropy_md5
           else
             raise 'Cannot find a compatible package system to get a md5 of the package list'
           end
@@ -78,6 +96,19 @@ module MCollective
 
           raise "dpkg command failed, exit code was #{result[:exitcode]}" unless result[:exitcode] == 0
           return result
+        end
+
+        def self.entropy_md5(output = '')
+          raise 'Cannot find equo at /usr/bin/equo' unless File.exists?('/usr/bin/equo')
+          result = {exitcode: nil,
+                    output: ''}
+          cmd = Shell.new('/usr/bin/equo query list installed --quiet', stdout: output)
+          cmd.runcommand
+          result[:exitcode] = cmd.status.exitstatus
+          result[:output] = Digest::MD5.new.hexdigest(output.split("\n").sort.join("\n"))
+
+          raise "equo query list installed failed, exit code was #{result[:exitcode]}" unless result[:exitcode].zero?
+          result
         end
 
         def self.yum_clean(clean_mode)
@@ -120,6 +151,8 @@ module MCollective
             return :apt
           elsif File.exists?('/usr/bin/zypper')
             return :zypper
+          elsif File.exists?('/usr/bin/equo')
+            return :entropy
           end
         end
 
@@ -131,6 +164,8 @@ module MCollective
             return apt_checkupdates
           elsif manager == :zypper
             return zypper_checkupdates
+          elsif manager == :entropy
+            return entropy_checkupdates
           else
             raise 'Cannot find a compatible package system to check updates'
           end
@@ -210,6 +245,33 @@ module MCollective
               result[:outdated_packages] << {:package => $1.strip,
                                              :version => $2.strip,
                                              :repo => $3.strip}
+            end
+          end
+
+          result
+        end
+
+        def self.entropy_checkupdates(output = "")
+          raise 'Cannot find equo at /usr/bin/equo' unless File.exists?('/usr/bin/equo')
+
+          result = {:exitcode => nil,
+                    :output => output,
+                    :outdated_packages => [],
+                    :package_manager => 'entropy'}
+
+          cmd = Shell.new('/usr/bin/equo upgrade --pretend', stdout: result[:output])
+          cmd.runcommand
+          result[:exitcode] = cmd.status.exitstatus
+
+          raise "Equo upgrade --pretend failed, exit code was #{result[:exitcode]}" unless result[:exitcode].zero?
+
+          result[:output].each_line do |line|
+            next unless line =~ /## \[[A-Z]\]/
+
+            if line =~ /\[([^ ]+?)\] ([^ ]+?)-((?:[0-9]+|\.)+[a-z]?(?:_(?:alpha|beta|pre|rc|p)\d?)*(?:-r\d+)?)/
+              result[:outdated_packages] << {package: $2.strip,
+                                             version: $3.strip,
+                                             repo: $1.strip}
             end
           end
 

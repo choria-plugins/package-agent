@@ -109,6 +109,14 @@ module MCollective
             File.expects(:exists?).with('/usr/bin/zypper').returns(true)
             PackageHelpers.packagemanager.should == :zypper
           end
+
+          it 'should return entropy if equo is present on the system' do
+            File.expects(:exists?).with('/usr/bin/yum').returns(false)
+            File.expects(:exists?).with('/usr/bin/apt-get').returns(false)
+            File.expects(:exists?).with('/usr/bin/zypper').returns(false)
+            File.expects(:exists?).with('/usr/bin/equo').returns(true)
+            PackageHelpers.packagemanager.should == :entropy
+          end
         end
 
         describe "count" do
@@ -121,6 +129,12 @@ module MCollective
           it 'should call #dpkg_count if apt is present on the system' do
             PackageHelpers.expects(:packagemanager).returns(:apt)
             PackageHelpers.expects(:dpkg_count)
+            PackageHelpers.count
+          end
+
+          it 'should call #entropy_count if equo is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:entropy)
+            PackageHelpers.expects(:entropy_count)
             PackageHelpers.count
           end
 
@@ -143,6 +157,12 @@ module MCollective
           it 'should call #dpkg_md5 if apt is present on the system' do
             PackageHelpers.expects(:packagemanager).returns(:apt)
             PackageHelpers.expects(:dpkg_md5)
+            PackageHelpers.md5
+          end
+
+          it 'should call #entropy_md5 if equo is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:entropy)
+            PackageHelpers.expects(:entropy_md5)
             PackageHelpers.md5
           end
 
@@ -339,6 +359,96 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
           end
         end
 
+        describe "entropy_count" do
+          it 'should raise if equo cannot be found on the system' do
+            File.expects(:exists?).with('/usr/bin/equo').returns(false)
+
+            expect{
+              PackageHelpers.entropy_count
+            }.to raise_error 'Cannot find equo at /usr/bin/equo'
+          end
+
+         it 'should raise if the equo command failed' do
+            File.expects(:exists?).with('/usr/bin/equo').returns(true)
+            shell = mock
+            status = mock
+            shell.stubs(:runcommand)
+            shell.stubs(:status).returns(status)
+            status.stubs(:exitstatus).returns(-1)
+            Shell.expects(:new).with('/usr/bin/equo query list installed --quiet', :stdout => "").returns(shell)
+
+            expect{
+              PackageHelpers.entropy_count
+            }.to raise_error 'equo query list installed failed, exit code was -1'
+          end
+
+
+          it 'should return the count of packages' do
+            output = "acct-group/avahi
+acct-group/avahi-autoipd
+acct-group/ceph
+acct-group/docker
+acct-user/sshd"
+
+            File.expects(:exists?).with('/usr/bin/equo').returns(true)
+            shell = mock
+            status = mock
+            Shell.stubs(:new).with('/usr/bin/equo query list installed --quiet', :stdout => output).returns(shell)
+            shell.stubs(:runcommand)
+            shell.stubs(:stdout).returns(output)
+            shell.expects(:status).returns(status)
+            status.stubs(:exitstatus).returns(0)
+
+            result = PackageHelpers.entropy_count(output)
+            result.should == {:exitcode => 0, :output => "5"}
+          end
+        end
+
+        describe "entropy_md5" do
+          it 'should raise if equo cannot be found on the system' do
+            File.expects(:exists?).with('/usr/bin/equo').returns(false)
+
+            expect{
+              PackageHelpers.entropy_md5
+            }.to raise_error 'Cannot find equo at /usr/bin/equo'
+          end
+
+         it 'should raise if the equo command failed' do
+            File.expects(:exists?).with('/usr/bin/equo').returns(true)
+            shell = mock
+            status = mock
+            shell.stubs(:runcommand)
+            shell.stubs(:status).returns(status)
+            status.stubs(:exitstatus).returns(-1)
+            Shell.expects(:new).with('/usr/bin/equo query list installed --quiet', :stdout => "").returns(shell)
+
+            expect{
+              PackageHelpers.entropy_md5
+            }.to raise_error 'equo query list installed failed, exit code was -1'
+          end
+
+
+          it 'should return the md5 of packages' do
+            output = "acct-group/avahi
+acct-group/avahi-autoipd
+acct-group/ceph
+acct-group/docker
+acct-user/sshd"
+
+            File.expects(:exists?).with('/usr/bin/equo').returns(true)
+            shell = mock
+            status = mock
+            Shell.stubs(:new).with('/usr/bin/equo query list installed --quiet', :stdout => output).returns(shell)
+            shell.stubs(:runcommand)
+            shell.stubs(:stdout).returns(output)
+            shell.expects(:status).returns(status)
+            status.stubs(:exitstatus).returns(0)
+
+            result = PackageHelpers.entropy_md5(output)
+            result.should == {:exitcode => 0, :output => 'c2ca6bdfa2a2e219e131d9dbb6975a7a'}
+          end
+        end
+
         describe "checkupdates" do
           it 'should call #yum_checkupdates if yum is present on the system' do
             PackageHelpers.expects(:packagemanager).returns(:yum)
@@ -355,6 +465,12 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
           it 'should call #zypper_checkupdates if zypper is present on the system' do
             PackageHelpers.expects(:packagemanager).returns(:zypper)
             PackageHelpers.expects(:zypper_checkupdates)
+            PackageHelpers.checkupdates
+          end
+
+          it 'should call #entropy_checkupdates if entropy is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:entropy)
+            PackageHelpers.expects(:entropy_checkupdates)
             PackageHelpers.checkupdates
           end
 
@@ -470,6 +586,55 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             result[:package_manager] == 'yum'
             result[:outdated_packages].should == [ {:package => 'package1', :version => '1.1.1', :repo => 'rspecrepo'},
                                                    {:package => 'package2', :version => '2.2.2', :repo => 'rspecrepo'}]
+          end
+        end
+
+        describe "#entropy_checkupdates" do
+          it 'should raise if equo cannot be found on the system' do
+            File.expects(:exists?).with('/usr/bin/equo').returns(false)
+
+            expect{
+              PackageHelpers.entropy_checkupdates
+            }.to raise_error 'Cannot find equo at /usr/bin/equo'
+          end
+
+          it 'should raise if the upgrade command failed' do
+            File.expects(:exists?).with('/usr/bin/equo').returns(true)
+            shell = mock
+            status = mock
+            Shell.stubs(:new).with('/usr/bin/equo upgrade --pretend', :stdout => '').returns(shell)
+            shell.stubs(:runcommand)
+            shell.expects(:status).returns(status)
+            status.stubs(:exitstatus).returns(-1)
+
+            expect{
+              PackageHelpers.entropy_checkupdates
+            }.to raise_error 'Equo upgrade --pretend failed, exit code was -1'
+          end
+
+
+          it 'should return the list of outdated packages' do
+            output = "╠  @@ Calculating dependencies...
+╠  @@ These are the packages that would be installed:
+╠  ## [U] [rspecrepo.org] app-spec/package1-2.5.3|0   [2.4.3-r1|0]
+╠  ## [U] [rspecrepo.org] app-spec/package2-4.6-r1|0   [4.6|0]
+╠  ## [N] [rspecrepo.org] app-spec/package-with-dash-0.2.2_beta4-r1|1"
+
+            File.expects(:exists?).with('/usr/bin/equo').returns(true)
+            shell = mock
+            status = mock
+            Shell.stubs(:new).with('/usr/bin/equo upgrade --pretend', :stdout => output).returns(shell)
+            shell.stubs(:runcommand)
+            shell.expects(:status).returns(status)
+            status.stubs(:exitstatus).returns(0)
+
+            result = PackageHelpers.entropy_checkupdates(output)
+            result[:exitcode].should == 0
+            result[:output].should == output
+            result[:package_manager] == 'yum'
+            result[:outdated_packages].should == [ {:package => 'app-spec/package1', :version => '2.5.3', :repo => 'rspecrepo.org'},
+                                                   {:package => 'app-spec/package2', :version => '4.6-r1', :repo => 'rspecrepo.org'},
+                                                   {:package => 'app-spec/package-with-dash', :version => '0.2.2_beta4-r1', :repo => 'rspecrepo.org'}]
           end
         end
       end
