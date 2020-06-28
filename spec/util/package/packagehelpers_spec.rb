@@ -59,6 +59,12 @@ module MCollective
             PackageHelpers.refresh
           end
 
+          it 'should call #pkg_update if pkg is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:pkg)
+            PackageHelpers.expects(:pkg_update)
+            PackageHelpers.refresh
+          end
+
           it 'should call #yum_update if yum is present on the system' do
             PackageHelpers.expects(:packagemanager).returns(:yum)
             PackageHelpers.expects(:yum_update)
@@ -118,6 +124,42 @@ module MCollective
             result.should == {:exitcode => 0, :output => "", :outdated_packages => [], :package_manager => "apt"}
           end
 
+        end
+
+        describe "#pkg_update" do
+          it 'should raise if the pkg binary cannot be found' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(false)
+            expect{
+              PackageHelpers.pkg_update
+            }.to raise_error('Cannot find pkg at /usr/sbin/pkg')
+          end
+
+          it 'should raise if the pkg command failed' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(true)
+            shell = mock
+            status = mock
+            shell.stubs(:runcommand)
+            shell.stubs(:status).returns(status)
+            status.stubs(:exitstatus).returns(-1)
+            Shell.expects(:new).with('/usr/sbin/pkg update', :stdout => "").returns(shell)
+
+            expect{
+              PackageHelpers.pkg_update
+            }.to raise_error 'pkg update failed, exit code was -1'
+          end
+
+          it 'should perform the update' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(true)
+            shell = mock
+            status = mock
+            shell.stubs(:runcommand)
+            shell.stubs(:status).returns(status)
+            status.stubs(:exitstatus).returns(0)
+            Shell.expects(:new).with("/usr/sbin/pkg update", :stdout => "").returns(shell)
+
+            result = PackageHelpers.pkg_update
+            result.should == {:exitcode => 0, :output => ""}
+          end
         end
 
         describe "#yum_update" do
@@ -208,6 +250,12 @@ module MCollective
             PackageHelpers.count
           end
 
+          it 'should call #pkg_count if pkg is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:pkg)
+            PackageHelpers.expects(:pkg_count)
+            PackageHelpers.count
+          end
+
           it 'should fail if no compatible package manager is present on the system' do
             PackageHelpers.expects(:packagemanager).returns(nil)
 
@@ -227,6 +275,12 @@ module MCollective
           it 'should call #dpkg_md5 if apt is present on the system' do
             PackageHelpers.expects(:packagemanager).returns(:apt)
             PackageHelpers.expects(:dpkg_md5)
+            PackageHelpers.md5
+          end
+
+          it 'should call #pkg_md5 if pkg is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:pkg)
+            PackageHelpers.expects(:pkg_md5)
             PackageHelpers.md5
           end
 
@@ -423,6 +477,92 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
           end
         end
 
+        describe "pkg_count" do
+          it 'should raise if pkg cannot be found on the system' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(false)
+
+            expect{
+              PackageHelpers.pkg_count
+            }.to raise_error 'Cannot find pkg at /usr/sbin/pkg'
+          end
+
+         it 'should raise if the pkg command failed' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(true)
+            shell = mock
+            status = mock
+            shell.stubs(:runcommand)
+            shell.stubs(:status).returns(status)
+            status.stubs(:exitstatus).returns(-1)
+            Shell.expects(:new).with("/usr/sbin/pkg query '%n'", :stdout => "").returns(shell)
+
+            expect{
+              PackageHelpers.pkg_count
+            }.to raise_error 'pkg command failed, exit code was -1'
+          end
+
+
+          it 'should return the count of packages' do
+            output = "choria
+puppet6
+rubygem-bolt"
+
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(true)
+            shell = mock
+            status = mock
+            Shell.stubs(:new).with("/usr/sbin/pkg query '%n'", :stdout => output).returns(shell)
+            shell.stubs(:runcommand)
+            shell.stubs(:stdout).returns(output)
+            shell.expects(:status).returns(status)
+            status.stubs(:exitstatus).returns(0)
+
+            result = PackageHelpers.pkg_count(output)
+            result.should == {:exitcode => 0, :output => "3"}
+          end
+        end
+
+        describe "pkg_md5" do
+          it 'should raise if pkg cannot be found on the system' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(false)
+
+            expect{
+              PackageHelpers.pkg_md5
+            }.to raise_error 'Cannot find pkg at /usr/sbin/pkg'
+          end
+
+         it 'should raise if the pkg command failed' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(true)
+            shell = mock
+            status = mock
+            shell.stubs(:runcommand)
+            shell.stubs(:status).returns(status)
+            status.stubs(:exitstatus).returns(-1)
+            Shell.expects(:new).with("/usr/sbin/pkg query '%n'", :stdout => "").returns(shell)
+
+            expect{
+              PackageHelpers.pkg_md5
+            }.to raise_error 'pkg command failed, exit code was -1'
+          end
+
+
+          it 'should return the md5 of packages' do
+            output = "choria
+puppet6
+rubygem-bolt"
+
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(true)
+            shell = mock
+            status = mock
+            Shell.stubs(:new).with("/usr/sbin/pkg query '%n'", :stdout => output).returns(shell)
+            shell.stubs(:runcommand)
+            shell.stubs(:stdout).returns(output)
+            shell.expects(:status).returns(status)
+            status.stubs(:exitstatus).returns(0)
+
+            result = PackageHelpers.pkg_md5(output)
+            result.should == {:exitcode => 0, :output => "9d53c24076713389929e731579cf118a"}
+          end
+        end
+
         describe "checkupdates" do
           it 'should call #yum_checkupdates if yum is present on the system' do
             PackageHelpers.expects(:packagemanager).returns(:yum)
@@ -439,6 +579,12 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
           it 'should call #zypper_checkupdates if zypper is present on the system' do
             PackageHelpers.expects(:packagemanager).returns(:zypper)
             PackageHelpers.expects(:zypper_checkupdates)
+            PackageHelpers.checkupdates
+          end
+
+          it 'should call #pkg_checkupdates if pkg is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:pkg)
+            PackageHelpers.expects(:pkg_checkupdates)
             PackageHelpers.checkupdates
           end
 
@@ -552,6 +698,80 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             result[:exitcode].should == 0
             result[:output].should == output
             result[:package_manager] == 'yum'
+            result[:outdated_packages].should == [ {:package => 'package1', :version => '1.1.1', :repo => 'rspecrepo'},
+                                                   {:package => 'package2', :version => '2.2.2', :repo => 'rspecrepo'}]
+          end
+        end
+
+        describe "#pkg_checkupdates" do
+          it 'should raise if pkg cannot be found on the system' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(false)
+
+            expect{
+              PackageHelpers.pkg_checkupdates
+            }.to raise_error 'Cannot find pkg at /usr/sbin/pkg'
+          end
+
+          it 'should raise if the query command failed' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(true)
+            shell = mock
+            status = mock
+            Shell.stubs(:new).with('/usr/sbin/pkg query --all "%n\\t%v\\t%R"', :stdout => '').returns(shell)
+            shell.stubs(:runcommand)
+            shell.expects(:status).returns(status)
+            status.stubs(:exitstatus).returns(-1)
+
+            expect{
+              PackageHelpers.pkg_checkupdates
+            }.to raise_error 'pkg query failed, exit code was -1'
+          end
+
+          it 'should raise if the rquery command failed' do
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(true)
+            query_shell = mock
+            rquery_shell = mock
+            query_status = mock
+            rquery_status = mock
+            Shell.stubs(:new).with('/usr/sbin/pkg query --all "%n\\t%v\\t%R"', :stdout => '').returns(query_shell)
+            query_shell.stubs(:runcommand)
+            query_shell.expects(:status).returns(query_status)
+            query_status.stubs(:exitstatus).returns(0)
+            Shell.stubs(:new).with('/usr/sbin/pkg rquery --all --no-repo-update "%n\\t%v\\t%R"', :stdout => '').returns(rquery_shell)
+            rquery_shell.stubs(:runcommand)
+            rquery_shell.expects(:status).returns(rquery_status)
+            rquery_status.stubs(:exitstatus).returns(-1)
+
+            expect{
+              PackageHelpers.pkg_checkupdates
+            }.to raise_error 'pkg rquery failed, exit code was -1'
+          end
+
+
+          it 'should return the list of outdated packages' do
+            query_output = "package1\t1.0.0\trspecrepo\npackage2\t2.0.0\trspecrepo\npackage3\t3.0.0\trspecrepo\n"
+            rquery_output = "package1\t1.1.1\trspecrepo\npackage2\t2.2.2\trspecrepo\npackage3\t3.0.0\trspecrepo"
+
+            output = ""
+            File.expects(:exists?).with('/usr/sbin/pkg').returns(true)
+            query_shell = mock
+            rquery_shell = mock
+            query_status = mock
+            rquery_status = mock
+            Shell.stubs(:new).with('/usr/sbin/pkg query --all "%n\\t%v\\t%R"', :stdout => query_output).returns(query_shell)
+            query_shell.stubs(:runcommand)
+            query_shell.expects(:status).returns(query_status)
+            query_status.stubs(:exitstatus).returns(0)
+            Shell.stubs(:new).with('/usr/sbin/pkg rquery --all --no-repo-update "%n\\t%v\\t%R"', :stdout => rquery_output).returns(rquery_shell)
+            rquery_shell.stubs(:runcommand)
+            rquery_shell.expects(:status).returns(rquery_status)
+            rquery_status.stubs(:exitstatus).returns(0)
+
+            result = PackageHelpers.pkg_checkupdates(query_output, rquery_output)
+            result[:exitcode].should == 0
+            result[:output].should == "package1-1.0.0                     <   needs updating (remote has 1.1.1)
+package2-2.0.0                     <   needs updating (remote has 2.2.2)
+"
+            result[:package_manager] == 'pkg'
             result[:outdated_packages].should == [ {:package => 'package1', :version => '1.1.1', :repo => 'rspecrepo'},
                                                    {:package => 'package2', :version => '2.2.2', :repo => 'rspecrepo'}]
           end
