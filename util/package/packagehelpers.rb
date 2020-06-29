@@ -113,6 +113,28 @@ module MCollective
           return apt_checkupdates
         end
 
+        def self.yum_update
+          raise "Cannot find yum at /usr/bin/yum" unless File.exists?("/usr/bin/yum")
+
+          yum_clean("metadata")
+          yum_checkupdates
+        end
+
+        def self.zypper_update
+          raise 'Cannot find zypper at /usr/bin/zypper' unless File.exists?('/usr/bin/zypper')
+
+          result = {:exitcode => nil,
+                    :output => ""}
+
+          cmd = Shell.new('/usr/bin/zypper refresh', :stdout => result[:output])
+          cmd.runcommand
+          result[:exitcode] = cmd.status.exitstatus
+
+          raise "zypper refresh failed, exit code was #{result[:exitcode]}" unless result[:exitcode] == 0
+
+          return result
+        end
+
         def self.packagemanager
           if File.exists?('/usr/bin/yum')
             return :yum
@@ -214,6 +236,19 @@ module MCollective
           end
 
           result
+        end
+
+        def self.refresh
+          manager = packagemanager
+          if manager == :apt
+            return apt_update
+          elsif manager == :yum
+            return yum_update
+          elsif manager == :zypper
+            return zypper_update
+          else
+            raise "Cannot find a compatible package system to update packages"
+          end
         end
       end
     end

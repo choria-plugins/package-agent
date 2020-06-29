@@ -52,6 +52,35 @@ module MCollective
           end
         end
 
+        describe "refresh" do
+          it 'should call #apt_update if apt is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:apt)
+            PackageHelpers.expects(:apt_update)
+            PackageHelpers.refresh
+          end
+
+          it 'should call #yum_update if yum is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:yum)
+            PackageHelpers.expects(:yum_update)
+            PackageHelpers.refresh
+          end
+
+          it 'should call #zypper_update if zypper is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(:zypper)
+            PackageHelpers.expects(:zypper_update)
+            PackageHelpers.refresh
+          end
+
+          it 'should fail if no compatible package manager is present on the system' do
+            PackageHelpers.expects(:packagemanager).returns(nil)
+
+            expect{
+              PackageHelpers.refresh
+            }.to raise_error 'Cannot find a compatible package system to update packages'
+          end
+        end
+
+
         describe "#apt_update" do
           it 'should raise if the apt-get binary cannot be found' do
             File.expects(:exists?).with('/usr/bin/apt-get').returns(false)
@@ -89,6 +118,61 @@ module MCollective
             result.should == {:exitcode => 0, :output => "", :outdated_packages => [], :package_manager => "apt"}
           end
 
+        end
+
+        describe "#yum_update" do
+          it 'should raise if the yum binary cannot be found' do
+            File.expects(:exists?).with('/usr/bin/yum').returns(false)
+            expect{
+              PackageHelpers.yum_update
+            }.to raise_error('Cannot find yum at /usr/bin/yum')
+          end
+
+          it 'should perform the update' do
+            File.expects(:exists?).with('/usr/bin/yum').returns(true)
+            PackageHelpers.expects(:yum_clean)
+            checkupdate_result = mock
+            PackageHelpers.expects(:yum_checkupdates).returns(checkupdate_result)
+
+            result = PackageHelpers.yum_update
+            result.should == checkupdate_result
+          end
+        end
+
+        describe "#zypper_update" do
+          it 'should raise if the zypper binary cannot be found' do
+            File.expects(:exists?).with('/usr/bin/zypper').returns(false)
+            expect{
+              PackageHelpers.zypper_update
+            }.to raise_error('Cannot find zypper at /usr/bin/zypper')
+          end
+
+          it 'should raise if the zypper command failed' do
+            File.expects(:exists?).with('/usr/bin/zypper').returns(true)
+            shell = mock
+            status = mock
+            shell.stubs(:runcommand)
+            shell.stubs(:status).returns(status)
+            status.stubs(:exitstatus).returns(-1)
+            Shell.expects(:new).with('/usr/bin/zypper refresh', :stdout => "").returns(shell)
+
+            expect{
+              PackageHelpers.zypper_update
+            }.to raise_error 'zypper refresh failed, exit code was -1'
+          end
+
+          it 'should perform the update' do
+            File.expects(:exists?).with('/usr/bin/zypper').returns(true)
+            shell = mock
+            status = mock
+            shell.stubs(:runcommand)
+            shell.stubs(:status).returns(status)
+            status.stubs(:exitstatus).returns(0)
+            Shell.expects(:new).with("/usr/bin/zypper refresh", :stdout => "").returns(shell)
+
+            result = PackageHelpers.zypper_update
+            result.should == {:exitcode => 0, :output => ""}
+          end
         end
 
         describe "#packagemanager" do
