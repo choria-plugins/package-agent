@@ -248,3 +248,13 @@ action "checkupdates", :description => "Check for updates" do
            :description => "The exitcode from the package manager command",
            :display_as => "Exit Code"
 end
+
+action "refresh", :description => "Update the available packages cache" do
+    output :output,
+           :description => "Output from the package manager",
+           :display_as  => "Output"
+
+    output :exitcode,
+           :description => "The exitcode from the package manager",
+           :display_as => "Exit Code"
+end
