@@ -27,7 +27,7 @@ module MCollective
         end
 
         def purge
-          if absent?
+          if purged?
             return {:status => status, :msg => 'Package is not present on the system'}
           else
             return {:output => call_action(:purge), :status => status}
@@ -61,6 +61,10 @@ module MCollective
         # Check whether the package is abent or present
         def absent?
           [:absent, :purged].include?(provider.properties[:ensure])
+        end
+
+        def purged?
+          provider.properties[:ensure] == :purged
         end
 
 	# Check whether the package was requested to be installed with a specific version
