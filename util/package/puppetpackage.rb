@@ -58,7 +58,7 @@ module MCollective
           @provider
         end
 
-        # Check whether the package is abent or present
+        # Check whether the package is absent or present
         def absent?
           [:absent, :purged].include?(provider.properties[:ensure])
         end
@@ -67,10 +67,10 @@ module MCollective
           provider.properties[:ensure] == :purged
         end
 
-	# Check whether the package was requested to be installed with a specific version
-	def no_version_requested?
-	  @options[:ensure].nil?
-	end
+        # Check whether the package was requested to be installed with a specific version
+        def no_version_requested?
+          @options[:ensure].nil?
+        end
 
         # Calls and cleans up the Puppet provider
         def call_action(action)
