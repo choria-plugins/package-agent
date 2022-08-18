@@ -1,36 +1,36 @@
 module MCollective
   module Util
     module Package
-      class PuppetPackage<Base
+      class PuppetPackage < Base
         def install
           if !absent? && no_version_requested?
-            return {:status => status, :msg => 'Package is already installed'}
+            {:status => status, :msg => "Package is already installed"}
           else
-            return {:output => call_action(:install), :status => status}
+            {:output => call_action(:install), :status => status}
           end
         end
 
         def update
           if absent?
-            return {:status => status, :msg => 'Package is not present on the system'}
+            {:status => status, :msg => "Package is not present on the system"}
           else
-            return {:output => call_action(:update), :status => status}
+            {:output => call_action(:update), :status => status}
           end
         end
 
         def uninstall
           if absent?
-            return {:status => status, :msg => 'Package is not present on the system'}
+            {:status => status, :msg => "Package is not present on the system"}
           else
-            return {:output =>call_action(:uninstall), :status => status}
+            {:output => call_action(:uninstall), :status => status}
           end
         end
 
         def purge
           if purged?
-            return {:status => status, :msg => 'Package is not present on the system'}
+            {:status => status, :msg => "Package is not present on the system"}
           else
-            return {:output => call_action(:purge), :status => status}
+            {:output => call_action(:purge), :status => status}
           end
         end
 
@@ -40,20 +40,19 @@ module MCollective
         end
 
         private
+
         # Creates a Puppet package provider
         def provider
-          require 'puppet'
+          require "puppet"
           @provider ||= Puppet::Type.type(:package).new({:name => @package}.merge(@options)).provider
 
-          if @provider.class.to_s == 'Puppet::Type::Package::ProviderWindows'
+          if @provider.class.to_s == "Puppet::Type::Package::ProviderWindows"
             # the windows provider cannot uninstall unless you got the object
             # via instances, as uninstall is implemented in terms of
             # provider.package
             instances = @provider.class.instances
             instance = instances.find { |pkg| pkg.name == @package }
-            if instance
-              @provider.package = instance.package
-            end
+            @provider.package = instance.package if instance
           end
           @provider
         end
@@ -76,7 +75,7 @@ module MCollective
         def call_action(action)
           output = provider.send(action)
           provider.flush
-          return output
+          output
         end
       end
     end

@@ -1,7 +1,6 @@
 module MCollective
   module Agent
     class Package < RPC::Agent
-
       action "install" do
         Package.do_pkg_action(request[:package], :install, reply, request[:version])
       end
@@ -103,18 +102,14 @@ module MCollective
       #
       #   {:x => "y"}
       #
-      def self.provider_options(provider, version = nil)
+      def self.provider_options(provider, version=nil)
         provider_options = {}
 
         Config.instance.pluginconf.each do |k, v|
-          if k =~ /package\.#{provider}/
-            provider_options[k.split(".").last.to_sym] = v
-          end
+          provider_options[k.split(".").last.to_sym] = v if /package\.#{provider}/.match?(k)
         end
 
-        unless version.nil?
-          provider_options[:ensure] = version
-        end
+        provider_options[:ensure] = version unless version.nil?
 
         provider_options
       end
@@ -129,11 +124,11 @@ module MCollective
 
         # somewhere around here this is converting the hash to a string :\
         if action == :status
-          result.each do |k,v|
+          result.each do |k, v|
             reply[k] = v.is_a?(Array) || v.is_a?(Hash) ? v : v.to_s
           end
         else
-          result[:status].each do |k,v|
+          result[:status].each do |k, v|
             reply[k] = v.is_a?(Array) || v.is_a?(Hash) ? v : v.to_s
           end
         end
