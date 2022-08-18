@@ -688,7 +688,7 @@ rubygem-bolt"
             result = described_class.apt_checkupdates(output)
             result[:exitcode].should eq 0
             result[:output].should eq output
-            result[:package_manager].should eq "yum"
+            result[:package_manager].should eq "apt"
             result[:outdated_packages].should eq [{:package => "package1", :version => "1.1.1", :repo => "rspecrepo"},
                                                   {:package => "package2", :version => "2.2.2", :repo => "rspecrepo"}]
           end
