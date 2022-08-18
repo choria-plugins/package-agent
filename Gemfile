@@ -7,6 +7,9 @@ group :test do
   gem 'rspec', '~> 2.11.0'
   gem 'mocha', '~> 0.10.0'
   gem 'mcollective-test'
+  gem 'rubocop'
+  gem 'rubocop-performance'
+  gem 'rubocop-rake'
 end
 
 mcollective_version = ENV['MCOLLECTIVE_GEM_VERSION']
