@@ -23,8 +23,8 @@ module MCollective
             package.expects(:call_action).with(:install).returns("the output")
 
             result = package.install
-            result[:status].should == status
-            result[:output].should == "the output"
+            result[:status].should eq status
+            result[:output].should eq "the output"
           end
 
           it "should return a failure message and status if the package is already installed" do
@@ -32,8 +32,8 @@ module MCollective
             package.expects(:status).returns(status)
 
             result = package.install
-            result[:status].should == status
-            result[:msg].should == "Package is already installed"
+            result[:status].should eq status
+            result[:msg].should eq "Package is already installed"
           end
         end
 
@@ -44,8 +44,8 @@ module MCollective
             package.expects(:call_action).with(:update).returns("the output")
 
             result = package.update
-            result[:status].should == status
-            result[:output].should == "the output"
+            result[:status].should eq status
+            result[:output].should eq "the output"
           end
 
           it "should return a failure message and status if the package is absent" do
@@ -53,8 +53,8 @@ module MCollective
             package.expects(:status).returns(status)
 
             result = package.update
-            result[:status].should == status
-            result[:msg].should == "Package is not present on the system"
+            result[:status].should eq status
+            result[:msg].should eq "Package is not present on the system"
           end
         end
 
@@ -65,8 +65,8 @@ module MCollective
             package.expects(:call_action).with(:uninstall).returns("the output")
 
             result = package.uninstall
-            result[:status].should == status
-            result[:output].should == "the output"
+            result[:status].should eq status
+            result[:output].should eq "the output"
           end
 
           it "should return a failure message and status if the package is absent" do
@@ -74,8 +74,8 @@ module MCollective
             package.expects(:status).returns(status)
 
             result = package.uninstall
-            result[:status].should == status
-            result[:msg].should == "Package is not present on the system"
+            result[:status].should eq status
+            result[:msg].should eq "Package is not present on the system"
           end
         end
 
@@ -86,8 +86,8 @@ module MCollective
             package.expects(:call_action).with(:purge).returns("the output")
 
             result = package.purge
-            result[:status].should == status
-            result[:output].should == "the output"
+            result[:status].should eq status
+            result[:output].should eq "the output"
           end
 
           it "should return a failure message and status if the package is absent" do
@@ -95,8 +95,8 @@ module MCollective
             package.expects(:status).returns(status)
 
             result = package.purge
-            result[:status].should == status
-            result[:msg].should == "Package is not present on the system"
+            result[:status].should eq status
+            result[:msg].should eq "Package is not present on the system"
           end
         end
 
@@ -108,7 +108,7 @@ module MCollective
         end
 
         describe "#provider" do
-          class Puppet; class Type; end; end
+          class Puppet; class Type; end; end # rubocop:disable Lint/ConstantDefinitionInBlock
 
           it "should load the provider only once" do
             package.unstub(:provider)
@@ -152,7 +152,7 @@ module MCollective
             Puppet::Type.stubs(:type).returns(type)
             type.stubs(:provider).returns(provider)
 
-            package.send(:provider).should == provider
+            package.send(:provider).should eq provider
           end
         end
 
@@ -173,7 +173,7 @@ module MCollective
             provider.expects(:send).with("rspec").returns("Called action")
             provider.expects(:flush)
             result = package.send(:call_action, "rspec")
-            result.should == "Called action"
+            result.should eq "Called action"
           end
         end
       end

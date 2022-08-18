@@ -97,6 +97,7 @@ The ACTION can be one of the following:
         pattern % [result[:sender], output]
       end
 
+      # rubocop:disable Metrics/MethodLength, Metrics/BlockNesting
       def main
         pkg = rpcclient("package")
         if configuration[:version].nil?
@@ -172,6 +173,7 @@ The ACTION can be one of the following:
         printrpcstats :summarize => true, :caption => "%s Package results" % configuration[:action]
         halt(pkg.stats)
       end
+      # rubocop:enable Metrics/MethodLength, Metrics/BlockNesting
     end
   end
 end

@@ -46,8 +46,8 @@ module MCollective
           ARGV << "rspec"
 
           @app.post_option_parser(config)
-          config[:action].should == "install"
-          config[:package].should == "rspec"
+          config[:action].should eq "install"
+          config[:package].should eq "rspec"
         end
 
         it 'should parse "package" "action" correctly' do
@@ -57,8 +57,8 @@ module MCollective
           ARGV << "install"
 
           @app.post_option_parser(config)
-          config[:action].should == "install"
-          config[:package].should == "rspec"
+          config[:action].should eq "install"
+          config[:package].should eq "rspec"
         end
       end
 

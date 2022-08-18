@@ -26,7 +26,7 @@ module MCollective
           cmd = Shell.new("/bin/rpm -qa", :stdout => output)
           cmd.runcommand
           result[:exitcode] = cmd.status.exitstatus
-          result[:output] = output.split("\n").reject { |line| line == "" }.size.to_s
+          result[:output] = output.split("\n").count { |line| line != "" }.to_s
 
           raise "rpm command failed, exit code was #{result[:exitcode]}" unless result[:exitcode] == 0
 
@@ -265,7 +265,7 @@ module MCollective
             next if /^S\s/.match?(line)
             next if /^--/.match?(line)
 
-            sup, repo, name, cur_ver, new_ver, arch = line.split("|")
+            _sup, repo, name, _cur_ver, new_ver, _arch = line.split("|")
             next unless repo && name && new_ver
 
             result[:outdated_packages] << {:package => name.strip,

@@ -10,9 +10,9 @@ module MCollective
         let(:base) { described_class.new("rspec", {:rkey => "rvalue"}) }
 
         describe "#initialize" do
-          it "should set the package name and the options hash" do
-            base.package.should == "rspec"
-            base.options.should == {:rkey => "rvalue"}
+          it "sets the package name and the options hash" do
+            base.package.should eq "rspec"
+            base.options.should eq({:rkey => "rvalue"})
           end
         end
 

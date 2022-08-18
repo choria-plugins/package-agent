@@ -5,6 +5,7 @@ begin
   require "rspec/core/rake_task"
   require "mcollective"
 rescue LoadError
+  # Ignore if bundled without tests
 end
 
 desc "Run agent and application tests"

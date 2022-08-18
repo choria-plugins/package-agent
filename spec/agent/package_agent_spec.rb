@@ -229,17 +229,17 @@ module MCollective
           config = mock
           Config.stubs(:instance).returns(config)
           config.stubs(:pluginconf).returns("package.provider" => "rspec")
-          described_class.package_provider.should == "rspec"
+          described_class.package_provider.should eq "rspec"
         end
 
         it "returns the default package provider if one is not specified" do
-          described_class.package_provider.should == "puppet"
+          described_class.package_provider.should eq "puppet"
         end
       end
 
       describe "#load_provider_class" do
         before do
-          module Util; module Package; end; end
+          module Util; module Package; end; end # rubocop:disable Lint/ConstantDefinitionInBlock
           described_class.unstub(:load_provider_class)
         end
 
@@ -271,7 +271,7 @@ module MCollective
           config.stubs(:pluginconf).returns({"package.rspec.k1" => "v1",
                                              "package.notrspec.k2" => "v2",
                                              "package.rspec.k3" => "v3"})
-          described_class.provider_options("rspec").should == {:k1 => "v1", :k3 => "v3"}
+          described_class.provider_options("rspec").should eq({:k1 => "v1", :k3 => "v3"})
         end
 
         it "should set ensure to the version if supplied" do
@@ -280,14 +280,14 @@ module MCollective
           config.stubs(:pluginconf).returns({"package.rspec.k1" => "v1",
                                              "package.notrspec.k2" => "v2",
                                              "package.rspec.k3" => "v3"})
-          described_class.provider_options("rspec", "1.21").should == {:k1 => "v1", :k3 => "v3", :ensure => "1.21"}
+          described_class.provider_options("rspec", "1.21").should eq({:k1 => "v1", :k3 => "v3", :ensure => "1.21"})
         end
 
         it "should return an empty hash if no provider specific options are found" do
           config = mock
           Config.stubs(:instance).returns(config)
           config.stubs(:pluginconf).returns({})
-          described_class.provider_options("rspec").should == {}
+          described_class.provider_options("rspec").should eq({})
         end
       end
 
@@ -296,14 +296,14 @@ module MCollective
           reply = {}
           provider.expects(:send, "rspec").returns({:status => {:k1 => "v1", :k2 => "v2"}})
           described_class.do_pkg_action("rspec", "rspec_action", reply)
-          reply.should == {:k1 => "v1", :k2 => "v2"}
+          reply.should eq({:k1 => "v1", :k2 => "v2"})
         end
 
         it "should call the status action and format the reply correctly" do
           reply = {}
           provider.expects(:send, :status).returns({:k1 => "v1", :k2 => "v2"})
           described_class.do_pkg_action("rspec", :status, reply)
-          reply.should == {:k1 => "v1", :k2 => "v2"}
+          reply.should eq({:k1 => "v1", :k2 => "v2"})
         end
 
         it "should raise an error if the :msg key is set" do
@@ -333,8 +333,8 @@ module MCollective
       end
 
       describe "#package_helper" do
-        it "should load an return the PackageHelpers class" do
-          module Util; module Package; end; end
+        it "loads an return the PackageHelpers class" do
+          module Util; module Package; end; end # rubocop:disable Lint/ConstantDefinitionInBlock
           PluginManager.expects(:loadclass).with("MCollective::Util::Package::PackageHelpers")
           Util::Package.expects(:const_get).with("PackageHelpers")
 

@@ -33,7 +33,7 @@ module MCollective
                     :output => ""}
 
           name = @package
-          opts = @options
+          _opts = @options
           cmd = Shell.new("#{yumhelper} --#{action} #{name}", :stdout => result[:output])
           cmd.runcommand
           result[:exitcode] = cmd.status.exitstatus

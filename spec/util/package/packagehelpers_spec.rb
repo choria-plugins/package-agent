@@ -47,7 +47,7 @@ module MCollective
             ["all", "headers", "packages", "metadata", "dbcache", "plugins", "expire-cache"].each do |mode|
               Shell.expects(:new).with("/usr/bin/yum clean #{mode}", :stdout => "").returns(shell)
               result = described_class.yum_clean(mode)
-              result.should == {:exitcode => 0, :output => ""}
+              result.should eq({:exitcode => 0, :output => ""})
             end
           end
         end
@@ -120,7 +120,7 @@ module MCollective
             Shell.stubs(:new).with("/usr/bin/apt-get --simulate dist-upgrade", :stdout => "").returns(shell)
 
             result = described_class.apt_update
-            result.should == {:exitcode => 0, :output => "", :outdated_packages => [], :package_manager => "apt"}
+            result.should eq({:exitcode => 0, :output => "", :outdated_packages => [], :package_manager => "apt"})
           end
         end
 
@@ -156,7 +156,7 @@ module MCollective
             Shell.expects(:new).with("/usr/sbin/pkg update", :stdout => "").returns(shell)
 
             result = described_class.pkg_update
-            result.should == {:exitcode => 0, :output => ""}
+            result.should eq({:exitcode => 0, :output => ""})
           end
         end
 
@@ -175,7 +175,7 @@ module MCollective
             described_class.expects(:yum_checkupdates).returns(checkupdate_result)
 
             result = described_class.yum_update
-            result.should == checkupdate_result
+            result.should eq checkupdate_result
           end
         end
 
@@ -211,27 +211,27 @@ module MCollective
             Shell.expects(:new).with("/usr/bin/zypper refresh", :stdout => "").returns(shell)
 
             result = described_class.zypper_update
-            result.should == {:exitcode => 0, :output => ""}
+            result.should eq({:exitcode => 0, :output => ""})
           end
         end
 
         describe "#packagemanager" do
           it "returns yum if yum is present on the system" do
             File.expects(:exist?).with("/usr/bin/yum").returns(true)
-            described_class.packagemanager.should == :yum
+            described_class.packagemanager.should eq :yum
           end
 
           it "returns apt if apt-get is present on the system" do
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
             File.expects(:exist?).with("/usr/bin/apt-get").returns(true)
-            described_class.packagemanager.should == :apt
+            described_class.packagemanager.should eq :apt
           end
 
           it "returns zypper if zypper is present on the system" do
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
             File.expects(:exist?).with("/usr/bin/apt-get").returns(false)
             File.expects(:exist?).with("/usr/bin/zypper").returns(true)
-            described_class.packagemanager.should == :zypper
+            described_class.packagemanager.should eq :zypper
           end
         end
 
@@ -329,7 +329,7 @@ module MCollective
             status.stubs(:exitstatus).returns(0)
 
             result = described_class.rpm_count(output)
-            result.should == {:exitcode => 0, :output => "3"}
+            result.should eq({:exitcode => 0, :output => "3"})
           end
         end
 
@@ -371,7 +371,7 @@ module MCollective
             status.stubs(:exitstatus).returns(0)
 
             result = described_class.rpm_md5(output)
-            result.should == {:exitcode => 0, :output => "f484823d241bd4315ac8741df15a91af"}
+            result.should eq({:exitcode => 0, :output => "f484823d241bd4315ac8741df15a91af"})
           end
         end
 
@@ -419,7 +419,7 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             status.stubs(:exitstatus).returns(0)
 
             result = described_class.dpkg_count(output)
-            result.should == {:exitcode => 0, :output => "3"}
+            result.should eq({:exitcode => 0, :output => "3"})
           end
         end
 
@@ -467,7 +467,7 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             status.stubs(:exitstatus).returns(0)
 
             result = described_class.dpkg_md5(output)
-            result.should == {:exitcode => 0, :output => "9608a4c69c0dd39b2ceb2cfafc36d67f"}
+            result.should eq({:exitcode => 0, :output => "9608a4c69c0dd39b2ceb2cfafc36d67f"})
           end
         end
 
@@ -509,7 +509,7 @@ rubygem-bolt"
             status.stubs(:exitstatus).returns(0)
 
             result = described_class.pkg_count(output)
-            result.should == {:exitcode => 0, :output => "3"}
+            result.should eq({:exitcode => 0, :output => "3"})
           end
         end
 
@@ -551,7 +551,7 @@ rubygem-bolt"
             status.stubs(:exitstatus).returns(0)
 
             result = described_class.pkg_md5(output)
-            result.should == {:exitcode => 0, :output => "9d53c24076713389929e731579cf118a"}
+            result.should eq({:exitcode => 0, :output => "9d53c24076713389929e731579cf118a"})
           end
         end
 
@@ -611,10 +611,10 @@ rubygem-bolt"
             status.stubs(:exitstatus).returns(0)
 
             result = described_class.yum_checkupdates(output)
-            result[:exitcode].should == 0
-            result[:output].should == output
-            result[:package_manager] == "yum"
-            result[:outdated_packages].should == [{:package => "package1", :version => "1.1.1", :repo => "rspecrepo"},
+            result[:exitcode].should eq 0
+            result[:output].should eq output
+            result[:package_manager].should eq "yum"
+            result[:outdated_packages].should eq [{:package => "package1", :version => "1.1.1", :repo => "rspecrepo"},
                                                   {:package => "package2", :version => "2.2.2", :repo => "rspecrepo"}]
           end
         end
@@ -643,10 +643,10 @@ rubygem-bolt"
             status.stubs(:exitstatus).returns(0)
 
             result = described_class.zypper_checkupdates(output)
-            result[:exitcode].should == 0
-            result[:output].should == output
-            result[:package_manager] == "zypper"
-            result[:outdated_packages].should == [{:package => "Package1", :version => "1.2.3-2", :repo => "Test_Repository"},
+            result[:exitcode].should eq 0
+            result[:output].should eq output
+            result[:package_manager].should eq "zypper"
+            result[:outdated_packages].should eq [{:package => "Package1", :version => "1.2.3-2", :repo => "Test_Repository"},
                                                   {:package => "Package2", :version => "0.2.2-2", :repo => "Test_Repository"}]
           end
         end
@@ -686,10 +686,10 @@ rubygem-bolt"
             status.stubs(:exitstatus).returns(0)
 
             result = described_class.apt_checkupdates(output)
-            result[:exitcode].should == 0
-            result[:output].should == output
-            result[:package_manager] == "yum"
-            result[:outdated_packages].should == [{:package => "package1", :version => "1.1.1", :repo => "rspecrepo"},
+            result[:exitcode].should eq 0
+            result[:output].should eq output
+            result[:package_manager].should eq "yum"
+            result[:outdated_packages].should eq [{:package => "package1", :version => "1.1.1", :repo => "rspecrepo"},
                                                   {:package => "package2", :version => "2.2.2", :repo => "rspecrepo"}]
           end
         end
@@ -741,7 +741,6 @@ rubygem-bolt"
             query_output = "package1\t1.0.0\trspecrepo\npackage2\t2.0.0\trspecrepo\npackage3\t3.0.0\trspecrepo\n"
             rquery_output = "package1\t1.1.1\trspecrepo\npackage2\t2.2.2\trspecrepo\npackage3\t3.0.0\trspecrepo"
 
-            output = ""
             File.expects(:exist?).with("/usr/sbin/pkg").returns(true)
             query_shell = mock
             rquery_shell = mock
@@ -757,12 +756,12 @@ rubygem-bolt"
             rquery_status.stubs(:exitstatus).returns(0)
 
             result = described_class.pkg_checkupdates(query_output, rquery_output)
-            result[:exitcode].should == 0
-            result[:output].should == "package1-1.0.0                     <   needs updating (remote has 1.1.1)
+            result[:exitcode].should eq 0
+            result[:output].should eq "package1-1.0.0                     <   needs updating (remote has 1.1.1)
 package2-2.0.0                     <   needs updating (remote has 2.2.2)
 "
-            result[:package_manager] == "pkg"
-            result[:outdated_packages].should == [{:package => "package1", :version => "1.1.1", :repo => "rspecrepo"},
+            result[:package_manager].should eq "pkg"
+            result[:outdated_packages].should eq [{:package => "package1", :version => "1.1.1", :repo => "rspecrepo"},
                                                   {:package => "package2", :version => "2.2.2", :repo => "rspecrepo"}]
           end
         end

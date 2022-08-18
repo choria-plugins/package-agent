@@ -109,7 +109,7 @@ Lint/AssignmentInCondition:
   Enabled: false
 
 Layout/LineLength:
-  Max: 180
+  Max: 200
 
 Metrics/PerceivedComplexity:
   Enabled: false

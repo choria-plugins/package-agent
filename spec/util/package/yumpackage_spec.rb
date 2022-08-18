@@ -12,7 +12,7 @@ module MCollective
           it "should delegate to call_action" do
             package.expects(:call_action).with(:install).returns("install output")
 
-            package.install.should == "install output"
+            package.install.should eq "install output"
           end
         end
 
@@ -20,7 +20,7 @@ module MCollective
           it "should delegate to call_action" do
             package.expects(:call_action).with(:update).returns("update output")
 
-            package.update.should == "update output"
+            package.update.should eq "update output"
           end
         end
 
@@ -28,7 +28,7 @@ module MCollective
           it "should delegate to call_action" do
             package.expects(:call_action).with(:remove).returns("remove output")
 
-            package.uninstall.should == "remove output"
+            package.uninstall.should eq "remove output"
           end
         end
 
@@ -36,7 +36,7 @@ module MCollective
           it "should delegate to call_action" do
             package.expects(:call_action).with(:status).returns("status output")
 
-            package.status.should == "status output"
+            package.status.should eq "status output"
           end
         end
 
@@ -44,7 +44,7 @@ module MCollective
           it "should delegate to call_action" do
             package.expects(:call_action).with(:search).returns("search output")
 
-            package.search.should == "search output"
+            package.search.should eq "search output"
           end
         end
 
@@ -66,7 +66,7 @@ module MCollective
 
             JSON.expects(:parse).returns({"faked" => "Called action"})
             result = package.send(:call_action, "test_action")
-            result.should == {:faked => "Called action"}
+            result.should eq({:faked => "Called action"})
           end
         end
       end
