@@ -87,13 +87,13 @@ The ACTION can be one of the following:
         if !%w[status count md5].include?(configuration[:action]) && (Util.empty_filter?(options[:filter]) && !configuration[:yes])
           handle_message(:print, 3)
 
-          STDOUT.flush
-          exit(1) unless /^(?:y|yes)$/i.match?(STDIN.gets.strip)
+          $stdout.flush
+          exit(1) unless /^(?:y|yes)$/i.match?($stdin.gets.strip)
         end
       end
 
       def format_output(pattern, sender_width, result)
-        output = result[:data][:output].gsub("\n", "\n" + " " * (sender_width + 2))
+        output = result[:data][:output].gsub("\n", "\n#{' ' * (sender_width + 2)}")
         pattern % [result[:sender], output]
       end
 

@@ -8,7 +8,7 @@ module MCollective
   module Data
     describe Package_data do
       describe "#query_data" do
-        let(:plugin) {Package_data.new}
+        let(:plugin) {described_class.new}
 
         before do
           @ddl = mock("ddl")

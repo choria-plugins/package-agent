@@ -7,7 +7,8 @@ module MCollective
   module Util
     module Package
       describe Base do
-        let(:base) { Base.new("rspec", {:rkey => "rvalue"}) }
+        let(:base) { described_class.new("rspec", {:rkey => "rvalue"}) }
+
         describe "#initialize" do
           it "should set the package name and the options hash" do
             base.package.should == "rspec"

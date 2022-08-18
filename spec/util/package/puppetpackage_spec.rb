@@ -8,7 +8,7 @@ module MCollective
   module Util
     module Package
       describe PuppetPackage do
-        let(:package) { PuppetPackage.new("rspec", {}) }
+        let(:package) { described_class.new("rspec", {}) }
         let(:provider) { mock }
         let(:status) { {:key => "value"} }
 

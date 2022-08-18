@@ -9,28 +9,28 @@ module MCollective
       describe "#validate" do
         it "should validate a valid package name without errors" do
           expect {
-            Package_nameValidator.validate("rspec")
-          }.to_not raise_error
+            described_class.validate("rspec")
+          }.not_to raise_error
 
           expect {
-            Package_nameValidator.validate("rspec1")
-          }.to_not raise_error
+            described_class.validate("rspec1")
+          }.not_to raise_error
 
           expect {
-            Package_nameValidator.validate("rspec-package")
-          }.to_not raise_error
+            described_class.validate("rspec-package")
+          }.not_to raise_error
 
           expect {
-            Package_nameValidator.validate("rspec-package-1")
-          }.to_not raise_error
+            described_class.validate("rspec-package-1")
+          }.not_to raise_error
 
           expect {
-            Package_nameValidator.validate("rspec.package")
-          }.to_not raise_error
+            described_class.validate("rspec.package")
+          }.not_to raise_error
         end
         it "should fail on a invalid package name" do
           expect {
-            Package_nameValidator.validate("rspec!")
+            described_class.validate("rspec!")
           }.to raise_error
         end
       end

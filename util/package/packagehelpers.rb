@@ -6,11 +6,12 @@ module MCollective
       class PackageHelpers
         def self.count
           manager = packagemanager
-          if manager == :yum
+          case manager
+          when :yum
             rpm_count
-          elsif manager == :apt
+          when :apt
             dpkg_count
-          elsif manager == :pkg
+          when :pkg
             pkg_count
           else
             raise "Cannot find a compatible package system to count packages"
@@ -25,7 +26,7 @@ module MCollective
           cmd = Shell.new("/bin/rpm -qa", :stdout => output)
           cmd.runcommand
           result[:exitcode] = cmd.status.exitstatus
-          result[:output] = output.split("\n").select { |line| line != "" }.size.to_s
+          result[:output] = output.split("\n").reject { |line| line == "" }.size.to_s
 
           raise "rpm command failed, exit code was #{result[:exitcode]}" unless result[:exitcode] == 0
 
@@ -40,7 +41,7 @@ module MCollective
           cmd = Shell.new("/usr/bin/dpkg --list", :stdout => output)
           cmd.runcommand
           result[:exitcode] = cmd.status.exitstatus
-          result[:output] = output.split("\n").select { |line| line[0..1] == "ii"}.size.to_s
+          result[:output] = output.split("\n").count { |line| line[0..1] == "ii"}.to_s
 
           raise "dpkg command failed, exit code was #{result[:exitcode]}" unless result[:exitcode] == 0
 
@@ -64,11 +65,12 @@ module MCollective
 
         def self.md5
           manager = packagemanager
-          if manager == :yum
+          case manager
+          when :yum
             rpm_md5
-          elsif manager == :apt
+          when :apt
             dpkg_md5
-          elsif manager == :pkg
+          when :pkg
             pkg_md5
           else
             raise "Cannot find a compatible package system to get a md5 of the package list"
@@ -207,13 +209,14 @@ module MCollective
 
         def self.checkupdates
           manager = packagemanager
-          if manager == :yum
+          case manager
+          when :yum
             yum_checkupdates
-          elsif manager == :apt
+          when :apt
             apt_checkupdates
-          elsif manager == :zypper
+          when :zypper
             zypper_checkupdates
-          elsif manager == :pkg
+          when :pkg
             pkg_checkupdates
           else
             raise "Cannot find a compatible package system to check updates"
@@ -350,13 +353,14 @@ module MCollective
 
         def self.refresh
           manager = packagemanager
-          if manager == :apt
+          case manager
+          when :apt
             apt_update
-          elsif manager == :pkg
+          when :pkg
             pkg_update
-          elsif manager == :yum
+          when :yum
             yum_update
-          elsif manager == :zypper
+          when :zypper
             zypper_update
           else
             raise "Cannot find a compatible package system to update packages"

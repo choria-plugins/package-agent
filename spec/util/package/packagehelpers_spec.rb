@@ -11,14 +11,14 @@ module MCollective
           it "raises if the yum binary cannot be found" do
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
             expect {
-              PackageHelpers.yum_clean("all")
+              described_class.yum_clean("all")
             }.to raise_error("Cannot find yum at /usr/bin/yum")
           end
 
           it "raises if an unsupported clean mode is supplied" do
             File.expects(:exist?).with("/usr/bin/yum").returns(true)
             expect {
-              PackageHelpers.yum_clean("rspec")
+              described_class.yum_clean("rspec")
             }.to raise_error("Unsupported yum clean mode: rspec")
           end
 
@@ -32,7 +32,7 @@ module MCollective
             status.stubs(:exitstatus).returns(-1)
 
             expect {
-              PackageHelpers.yum_clean("all")
+              described_class.yum_clean("all")
             }.to raise_error("Yum clean failed, exit code was -1")
           end
 
@@ -46,42 +46,42 @@ module MCollective
 
             ["all", "headers", "packages", "metadata", "dbcache", "plugins", "expire-cache"].each do |mode|
               Shell.expects(:new).with("/usr/bin/yum clean #{mode}", :stdout => "").returns(shell)
-              result = PackageHelpers.yum_clean(mode)
+              result = described_class.yum_clean(mode)
               result.should == {:exitcode => 0, :output => ""}
             end
           end
         end
 
         describe "refresh" do
-          it "should call #apt_update if apt is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:apt)
-            PackageHelpers.expects(:apt_update)
-            PackageHelpers.refresh
+          it "calls #apt_update if apt is present on the system" do
+            described_class.expects(:packagemanager).returns(:apt)
+            described_class.expects(:apt_update)
+            described_class.refresh
           end
 
-          it "should call #pkg_update if pkg is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:pkg)
-            PackageHelpers.expects(:pkg_update)
-            PackageHelpers.refresh
+          it "calls #pkg_update if pkg is present on the system" do
+            described_class.expects(:packagemanager).returns(:pkg)
+            described_class.expects(:pkg_update)
+            described_class.refresh
           end
 
-          it "should call #yum_update if yum is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:yum)
-            PackageHelpers.expects(:yum_update)
-            PackageHelpers.refresh
+          it "calls #yum_update if yum is present on the system" do
+            described_class.expects(:packagemanager).returns(:yum)
+            described_class.expects(:yum_update)
+            described_class.refresh
           end
 
-          it "should call #zypper_update if zypper is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:zypper)
-            PackageHelpers.expects(:zypper_update)
-            PackageHelpers.refresh
+          it "calls #zypper_update if zypper is present on the system" do
+            described_class.expects(:packagemanager).returns(:zypper)
+            described_class.expects(:zypper_update)
+            described_class.refresh
           end
 
-          it "should fail if no compatible package manager is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(nil)
+          it "fails if no compatible package manager is present on the system" do
+            described_class.expects(:packagemanager).returns(nil)
 
             expect {
-              PackageHelpers.refresh
+              described_class.refresh
             }.to raise_error "Cannot find a compatible package system to update packages"
           end
         end
@@ -90,7 +90,7 @@ module MCollective
           it "raises if the apt-get binary cannot be found" do
             File.expects(:exist?).with("/usr/bin/apt-get").returns(false)
             expect {
-              PackageHelpers.apt_update
+              described_class.apt_update
             }.to raise_error("Cannot find apt-get at /usr/bin/apt-get")
           end
 
@@ -104,7 +104,7 @@ module MCollective
             Shell.expects(:new).with("/usr/bin/apt-get update", :stdout => "").returns(shell)
 
             expect {
-              PackageHelpers.apt_update
+              described_class.apt_update
             }.to raise_error "apt-get update failed, exit code was -1"
           end
 
@@ -119,7 +119,7 @@ module MCollective
             Shell.expects(:new).with("/usr/bin/apt-get update", :stdout => "").returns(shell)
             Shell.stubs(:new).with("/usr/bin/apt-get --simulate dist-upgrade", :stdout => "").returns(shell)
 
-            result = PackageHelpers.apt_update
+            result = described_class.apt_update
             result.should == {:exitcode => 0, :output => "", :outdated_packages => [], :package_manager => "apt"}
           end
         end
@@ -128,7 +128,7 @@ module MCollective
           it "raises if the pkg binary cannot be found" do
             File.expects(:exist?).with("/usr/sbin/pkg").returns(false)
             expect {
-              PackageHelpers.pkg_update
+              described_class.pkg_update
             }.to raise_error("Cannot find pkg at /usr/sbin/pkg")
           end
 
@@ -142,7 +142,7 @@ module MCollective
             Shell.expects(:new).with("/usr/sbin/pkg update", :stdout => "").returns(shell)
 
             expect {
-              PackageHelpers.pkg_update
+              described_class.pkg_update
             }.to raise_error "pkg update failed, exit code was -1"
           end
 
@@ -155,7 +155,7 @@ module MCollective
             status.stubs(:exitstatus).returns(0)
             Shell.expects(:new).with("/usr/sbin/pkg update", :stdout => "").returns(shell)
 
-            result = PackageHelpers.pkg_update
+            result = described_class.pkg_update
             result.should == {:exitcode => 0, :output => ""}
           end
         end
@@ -164,17 +164,17 @@ module MCollective
           it "raises if the yum binary cannot be found" do
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
             expect {
-              PackageHelpers.yum_update
+              described_class.yum_update
             }.to raise_error("Cannot find yum at /usr/bin/yum")
           end
 
           it "performs the update" do
             File.expects(:exist?).with("/usr/bin/yum").returns(true)
-            PackageHelpers.expects(:yum_clean)
+            described_class.expects(:yum_clean)
             checkupdate_result = mock
-            PackageHelpers.expects(:yum_checkupdates).returns(checkupdate_result)
+            described_class.expects(:yum_checkupdates).returns(checkupdate_result)
 
-            result = PackageHelpers.yum_update
+            result = described_class.yum_update
             result.should == checkupdate_result
           end
         end
@@ -183,7 +183,7 @@ module MCollective
           it "raises if the zypper binary cannot be found" do
             File.expects(:exist?).with("/usr/bin/zypper").returns(false)
             expect {
-              PackageHelpers.zypper_update
+              described_class.zypper_update
             }.to raise_error("Cannot find zypper at /usr/bin/zypper")
           end
 
@@ -197,7 +197,7 @@ module MCollective
             Shell.expects(:new).with("/usr/bin/zypper refresh", :stdout => "").returns(shell)
 
             expect {
-              PackageHelpers.zypper_update
+              described_class.zypper_update
             }.to raise_error "zypper refresh failed, exit code was -1"
           end
 
@@ -210,7 +210,7 @@ module MCollective
             status.stubs(:exitstatus).returns(0)
             Shell.expects(:new).with("/usr/bin/zypper refresh", :stdout => "").returns(shell)
 
-            result = PackageHelpers.zypper_update
+            result = described_class.zypper_update
             result.should == {:exitcode => 0, :output => ""}
           end
         end
@@ -218,75 +218,75 @@ module MCollective
         describe "#packagemanager" do
           it "returns yum if yum is present on the system" do
             File.expects(:exist?).with("/usr/bin/yum").returns(true)
-            PackageHelpers.packagemanager.should == :yum
+            described_class.packagemanager.should == :yum
           end
 
           it "returns apt if apt-get is present on the system" do
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
             File.expects(:exist?).with("/usr/bin/apt-get").returns(true)
-            PackageHelpers.packagemanager.should == :apt
+            described_class.packagemanager.should == :apt
           end
 
           it "returns zypper if zypper is present on the system" do
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
             File.expects(:exist?).with("/usr/bin/apt-get").returns(false)
             File.expects(:exist?).with("/usr/bin/zypper").returns(true)
-            PackageHelpers.packagemanager.should == :zypper
+            described_class.packagemanager.should == :zypper
           end
         end
 
         describe "count" do
-          it "should call #rpm_count if yum is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:yum)
-            PackageHelpers.expects(:rpm_count)
-            PackageHelpers.count
+          it "calls #rpm_count if yum is present on the system" do
+            described_class.expects(:packagemanager).returns(:yum)
+            described_class.expects(:rpm_count)
+            described_class.count
           end
 
-          it "should call #dpkg_count if apt is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:apt)
-            PackageHelpers.expects(:dpkg_count)
-            PackageHelpers.count
+          it "calls #dpkg_count if apt is present on the system" do
+            described_class.expects(:packagemanager).returns(:apt)
+            described_class.expects(:dpkg_count)
+            described_class.count
           end
 
-          it "should call #pkg_count if pkg is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:pkg)
-            PackageHelpers.expects(:pkg_count)
-            PackageHelpers.count
+          it "calls #pkg_count if pkg is present on the system" do
+            described_class.expects(:packagemanager).returns(:pkg)
+            described_class.expects(:pkg_count)
+            described_class.count
           end
 
-          it "should fail if no compatible package manager is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(nil)
+          it "fails if no compatible package manager is present on the system" do
+            described_class.expects(:packagemanager).returns(nil)
 
             expect {
-              PackageHelpers.count
+              described_class.count
             }.to raise_error "Cannot find a compatible package system to count packages"
           end
         end
 
         describe "md5" do
-          it "should call #rpm_md5 if yum is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:yum)
-            PackageHelpers.expects(:rpm_md5)
-            PackageHelpers.md5
+          it "calls #rpm_md5 if yum is present on the system" do
+            described_class.expects(:packagemanager).returns(:yum)
+            described_class.expects(:rpm_md5)
+            described_class.md5
           end
 
-          it "should call #dpkg_md5 if apt is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:apt)
-            PackageHelpers.expects(:dpkg_md5)
-            PackageHelpers.md5
+          it "calls #dpkg_md5 if apt is present on the system" do
+            described_class.expects(:packagemanager).returns(:apt)
+            described_class.expects(:dpkg_md5)
+            described_class.md5
           end
 
-          it "should call #pkg_md5 if pkg is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:pkg)
-            PackageHelpers.expects(:pkg_md5)
-            PackageHelpers.md5
+          it "calls #pkg_md5 if pkg is present on the system" do
+            described_class.expects(:packagemanager).returns(:pkg)
+            described_class.expects(:pkg_md5)
+            described_class.md5
           end
 
-          it "should fail if no compatible package manager is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(nil)
+          it "fails if no compatible package manager is present on the system" do
+            described_class.expects(:packagemanager).returns(nil)
 
             expect {
-              PackageHelpers.md5
+              described_class.md5
             }.to raise_error "Cannot find a compatible package system to get a md5 of the package list"
           end
         end
@@ -296,7 +296,7 @@ module MCollective
             File.expects(:exist?).with("/bin/rpm").returns(false)
 
             expect {
-              PackageHelpers.rpm_count
+              described_class.rpm_count
             }.to raise_error "Cannot find rpm at /bin/rpm"
           end
 
@@ -310,7 +310,7 @@ module MCollective
             Shell.expects(:new).with("/bin/rpm -qa", :stdout => "").returns(shell)
 
             expect {
-              PackageHelpers.rpm_count
+              described_class.rpm_count
             }.to raise_error "rpm command failed, exit code was -1"
           end
 
@@ -328,7 +328,7 @@ module MCollective
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.rpm_count(output)
+            result = described_class.rpm_count(output)
             result.should == {:exitcode => 0, :output => "3"}
           end
         end
@@ -338,7 +338,7 @@ module MCollective
             File.expects(:exist?).with("/bin/rpm").returns(false)
 
             expect {
-              PackageHelpers.rpm_md5
+              described_class.rpm_md5
             }.to raise_error "Cannot find rpm at /bin/rpm"
           end
 
@@ -352,7 +352,7 @@ module MCollective
             Shell.expects(:new).with("/bin/rpm -qa", :stdout => "").returns(shell)
 
             expect {
-              PackageHelpers.rpm_md5
+              described_class.rpm_md5
             }.to raise_error "rpm command failed, exit code was -1"
           end
 
@@ -370,7 +370,7 @@ module MCollective
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.rpm_md5(output)
+            result = described_class.rpm_md5(output)
             result.should == {:exitcode => 0, :output => "f484823d241bd4315ac8741df15a91af"}
           end
         end
@@ -380,7 +380,7 @@ module MCollective
             File.expects(:exist?).with("/usr/bin/dpkg").returns(false)
 
             expect {
-              PackageHelpers.dpkg_count
+              described_class.dpkg_count
             }.to raise_error "Cannot find dpkg at /usr/bin/dpkg"
           end
 
@@ -394,7 +394,7 @@ module MCollective
             Shell.expects(:new).with("/usr/bin/dpkg --list", :stdout => "").returns(shell)
 
             expect {
-              PackageHelpers.dpkg_count
+              described_class.dpkg_count
             }.to raise_error "dpkg command failed, exit code was -1"
           end
 
@@ -418,7 +418,7 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.dpkg_count(output)
+            result = described_class.dpkg_count(output)
             result.should == {:exitcode => 0, :output => "3"}
           end
         end
@@ -428,7 +428,7 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             File.expects(:exist?).with("/usr/bin/dpkg").returns(false)
 
             expect {
-              PackageHelpers.dpkg_md5
+              described_class.dpkg_md5
             }.to raise_error "Cannot find dpkg at /usr/bin/dpkg"
           end
 
@@ -442,7 +442,7 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             Shell.expects(:new).with("/usr/bin/dpkg --list", :stdout => "").returns(shell)
 
             expect {
-              PackageHelpers.dpkg_md5
+              described_class.dpkg_md5
             }.to raise_error "dpkg command failed, exit code was -1"
           end
 
@@ -466,7 +466,7 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.dpkg_md5(output)
+            result = described_class.dpkg_md5(output)
             result.should == {:exitcode => 0, :output => "9608a4c69c0dd39b2ceb2cfafc36d67f"}
           end
         end
@@ -476,7 +476,7 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             File.expects(:exist?).with("/usr/sbin/pkg").returns(false)
 
             expect {
-              PackageHelpers.pkg_count
+              described_class.pkg_count
             }.to raise_error "Cannot find pkg at /usr/sbin/pkg"
           end
 
@@ -490,7 +490,7 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             Shell.expects(:new).with("/usr/sbin/pkg query '%n'", :stdout => "").returns(shell)
 
             expect {
-              PackageHelpers.pkg_count
+              described_class.pkg_count
             }.to raise_error "pkg command failed, exit code was -1"
           end
 
@@ -508,7 +508,7 @@ rubygem-bolt"
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.pkg_count(output)
+            result = described_class.pkg_count(output)
             result.should == {:exitcode => 0, :output => "3"}
           end
         end
@@ -518,7 +518,7 @@ rubygem-bolt"
             File.expects(:exist?).with("/usr/sbin/pkg").returns(false)
 
             expect {
-              PackageHelpers.pkg_md5
+              described_class.pkg_md5
             }.to raise_error "Cannot find pkg at /usr/sbin/pkg"
           end
 
@@ -532,7 +532,7 @@ rubygem-bolt"
             Shell.expects(:new).with("/usr/sbin/pkg query '%n'", :stdout => "").returns(shell)
 
             expect {
-              PackageHelpers.pkg_md5
+              described_class.pkg_md5
             }.to raise_error "pkg command failed, exit code was -1"
           end
 
@@ -550,41 +550,41 @@ rubygem-bolt"
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.pkg_md5(output)
+            result = described_class.pkg_md5(output)
             result.should == {:exitcode => 0, :output => "9d53c24076713389929e731579cf118a"}
           end
         end
 
         describe "checkupdates" do
-          it "should call #yum_checkupdates if yum is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:yum)
-            PackageHelpers.expects(:yum_checkupdates)
-            PackageHelpers.checkupdates
+          it "calls #yum_checkupdates if yum is present on the system" do
+            described_class.expects(:packagemanager).returns(:yum)
+            described_class.expects(:yum_checkupdates)
+            described_class.checkupdates
           end
 
-          it "should call #apt_checkupdates if apt is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:apt)
-            PackageHelpers.expects(:apt_checkupdates)
-            PackageHelpers.checkupdates
+          it "calls #apt_checkupdates if apt is present on the system" do
+            described_class.expects(:packagemanager).returns(:apt)
+            described_class.expects(:apt_checkupdates)
+            described_class.checkupdates
           end
 
-          it "should call #zypper_checkupdates if zypper is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:zypper)
-            PackageHelpers.expects(:zypper_checkupdates)
-            PackageHelpers.checkupdates
+          it "calls #zypper_checkupdates if zypper is present on the system" do
+            described_class.expects(:packagemanager).returns(:zypper)
+            described_class.expects(:zypper_checkupdates)
+            described_class.checkupdates
           end
 
-          it "should call #pkg_checkupdates if pkg is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(:pkg)
-            PackageHelpers.expects(:pkg_checkupdates)
-            PackageHelpers.checkupdates
+          it "calls #pkg_checkupdates if pkg is present on the system" do
+            described_class.expects(:packagemanager).returns(:pkg)
+            described_class.expects(:pkg_checkupdates)
+            described_class.checkupdates
           end
 
-          it "should fail if no compatible package manager is present on the system" do
-            PackageHelpers.expects(:packagemanager).returns(nil)
+          it "fails if no compatible package manager is present on the system" do
+            described_class.expects(:packagemanager).returns(nil)
 
             expect {
-              PackageHelpers.checkupdates
+              described_class.checkupdates
             }.to raise_error "Cannot find a compatible package system to check updates"
           end
         end
@@ -594,7 +594,7 @@ rubygem-bolt"
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
 
             expect {
-              PackageHelpers.yum_checkupdates
+              described_class.yum_checkupdates
             }.to raise_error "Cannot find yum at /usr/bin/yum"
           end
 
@@ -610,7 +610,7 @@ rubygem-bolt"
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.yum_checkupdates(output)
+            result = described_class.yum_checkupdates(output)
             result[:exitcode].should == 0
             result[:output].should == output
             result[:package_manager] == "yum"
@@ -624,7 +624,7 @@ rubygem-bolt"
             File.expects(:exist?).with("/usr/bin/zypper").returns(false)
 
             expect {
-              PackageHelpers.zypper_checkupdates
+              described_class.zypper_checkupdates
             }.to raise_error "Cannot find zypper at /usr/bin/zypper"
           end
 
@@ -642,7 +642,7 @@ rubygem-bolt"
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.zypper_checkupdates(output)
+            result = described_class.zypper_checkupdates(output)
             result[:exitcode].should == 0
             result[:output].should == output
             result[:package_manager] == "zypper"
@@ -656,7 +656,7 @@ rubygem-bolt"
             File.expects(:exist?).with("/usr/bin/apt-get").returns(false)
 
             expect {
-              PackageHelpers.apt_checkupdates
+              described_class.apt_checkupdates
             }.to raise_error "Cannot find apt-get at /usr/bin/apt-get"
           end
 
@@ -670,7 +670,7 @@ rubygem-bolt"
             status.stubs(:exitstatus).returns(-1)
 
             expect {
-              PackageHelpers.apt_checkupdates
+              described_class.apt_checkupdates
             }.to raise_error "Apt check-update failed, exit code was -1"
           end
 
@@ -685,7 +685,7 @@ rubygem-bolt"
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.apt_checkupdates(output)
+            result = described_class.apt_checkupdates(output)
             result[:exitcode].should == 0
             result[:output].should == output
             result[:package_manager] == "yum"
@@ -699,7 +699,7 @@ rubygem-bolt"
             File.expects(:exist?).with("/usr/sbin/pkg").returns(false)
 
             expect {
-              PackageHelpers.pkg_checkupdates
+              described_class.pkg_checkupdates
             }.to raise_error "Cannot find pkg at /usr/sbin/pkg"
           end
 
@@ -713,7 +713,7 @@ rubygem-bolt"
             status.stubs(:exitstatus).returns(-1)
 
             expect {
-              PackageHelpers.pkg_checkupdates
+              described_class.pkg_checkupdates
             }.to raise_error "pkg query failed, exit code was -1"
           end
 
@@ -733,7 +733,7 @@ rubygem-bolt"
             rquery_status.stubs(:exitstatus).returns(-1)
 
             expect {
-              PackageHelpers.pkg_checkupdates
+              described_class.pkg_checkupdates
             }.to raise_error "pkg rquery failed, exit code was -1"
           end
 
@@ -756,7 +756,7 @@ rubygem-bolt"
             rquery_shell.expects(:status).returns(rquery_status)
             rquery_status.stubs(:exitstatus).returns(0)
 
-            result = PackageHelpers.pkg_checkupdates(query_output, rquery_output)
+            result = described_class.pkg_checkupdates(query_output, rquery_output)
             result[:exitcode].should == 0
             result[:output].should == "package1-1.0.0                     <   needs updating (remote has 1.1.1)
 package2-2.0.0                     <   needs updating (remote has 2.2.2)

@@ -6,7 +6,7 @@ module MCollective
   module Util
     module Package
       describe YumPackage do
-        let(:package) { YumPackage.new("rspec", {}) }
+        let(:package) { described_class.new("rspec", {}) }
 
         describe "#install" do
           it "should delegate to call_action" do

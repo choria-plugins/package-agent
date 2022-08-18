@@ -11,10 +11,10 @@ module MCollective
       before do
         agent_file = File.join(File.dirname(__FILE__), "../../", "agent", "package.rb")
         @agent = MCollective::Test::LocalAgentTest.new("package", :agent_file => agent_file).plugin
-        Package.stubs(:load_provider_class).returns(provider)
+        described_class.stubs(:load_provider_class).returns(provider)
         provider.stubs(:new).returns(provider)
-        Package.stubs(:package_provider)
-        Package.stubs(:provider_options)
+        described_class.stubs(:package_provider)
+        described_class.stubs(:provider_options)
       end
 
       describe "#install" do
@@ -223,24 +223,24 @@ module MCollective
 
       describe "#package_provider" do
         before do
-          Package.unstub(:package_provider)
+          described_class.unstub(:package_provider)
         end
         it "should return the package provider if one is specified" do
           config = mock
           Config.stubs(:instance).returns(config)
           config.stubs(:pluginconf).returns("package.provider" => "rspec")
-          Package.package_provider.should == "rspec"
+          described_class.package_provider.should == "rspec"
         end
 
-        it "should return the default package provider if one is not specified" do
-          Package.package_provider.should == "puppet"
+        it "returns the default package provider if one is not specified" do
+          described_class.package_provider.should == "puppet"
         end
       end
 
       describe "#load_provider_class" do
         before do
           module Util; module Package; end; end
-          Package.unstub(:load_provider_class)
+          described_class.unstub(:load_provider_class)
         end
 
         it "should return the provider class object" do
@@ -249,20 +249,20 @@ module MCollective
           PluginManager.stubs(:loadclass).with("MCollective::Util::Package::RspecPackage")
           Util::Package.stubs(:const_get).with("RspecPackage")
 
-          Package.load_provider_class("rspec")
+          described_class.load_provider_class("rspec")
         end
 
         it "should log and raise if the provider cannot be loaded" do
           PluginManager.stubs(:loadclass).raises("error")
           expect {
-            Package.load_provider_class("rspec")
+            described_class.load_provider_class("rspec")
           }.to raise_error "Cannot load package provider class 'RspecPackage': error"
         end
       end
 
       describe "#provider_options" do
         before do
-          Package.unstub(:provider_options)
+          described_class.unstub(:provider_options)
         end
 
         it "should return a hash of provider specific options" do
@@ -271,7 +271,7 @@ module MCollective
           config.stubs(:pluginconf).returns({"package.rspec.k1" => "v1",
                                              "package.notrspec.k2" => "v2",
                                              "package.rspec.k3" => "v3"})
-          Package.provider_options("rspec").should == {:k1 => "v1", :k3 => "v3"}
+          described_class.provider_options("rspec").should == {:k1 => "v1", :k3 => "v3"}
         end
 
         it "should set ensure to the version if supplied" do
@@ -280,14 +280,14 @@ module MCollective
           config.stubs(:pluginconf).returns({"package.rspec.k1" => "v1",
                                              "package.notrspec.k2" => "v2",
                                              "package.rspec.k3" => "v3"})
-          Package.provider_options("rspec", "1.21").should == {:k1 => "v1", :k3 => "v3", :ensure => "1.21"}
+          described_class.provider_options("rspec", "1.21").should == {:k1 => "v1", :k3 => "v3", :ensure => "1.21"}
         end
 
         it "should return an empty hash if no provider specific options are found" do
           config = mock
           Config.stubs(:instance).returns(config)
           config.stubs(:pluginconf).returns({})
-          Package.provider_options("rspec").should == {}
+          described_class.provider_options("rspec").should == {}
         end
       end
 
@@ -295,14 +295,14 @@ module MCollective
         it "should call the correct pkg method and modify the reply" do
           reply = {}
           provider.expects(:send, "rspec").returns({:status => {:k1 => "v1", :k2 => "v2"}})
-          Package.do_pkg_action("rspec", "rspec_action", reply)
+          described_class.do_pkg_action("rspec", "rspec_action", reply)
           reply.should == {:k1 => "v1", :k2 => "v2"}
         end
 
         it "should call the status action and format the reply correctly" do
           reply = {}
           provider.expects(:send, :status).returns({:k1 => "v1", :k2 => "v2"})
-          Package.do_pkg_action("rspec", :status, reply)
+          described_class.do_pkg_action("rspec", :status, reply)
           reply.should == {:k1 => "v1", :k2 => "v2"}
         end
 
@@ -310,7 +310,7 @@ module MCollective
           reply = {}
           provider.expects(:send, "rspec").returns({:status => {:k1 => "v1", :k2 => "v2"}, :msg => "error"})
           expect {
-            Package.do_pkg_action("rspec", "rspec_action", reply)
+            described_class.do_pkg_action("rspec", "rspec_action", reply)
           }.to raise_error "error"
         end
       end

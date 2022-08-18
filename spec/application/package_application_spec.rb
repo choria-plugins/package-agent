@@ -67,8 +67,8 @@ module MCollective
           Util.expects(:empty_filter?).returns(true)
           @app.stubs(:options).returns({:filter => {}})
           @app.expects(:handle_message).with(:print, 3)
-          STDOUT.expects(:flush)
-          STDIN.stubs(:gets).returns("y")
+          $stdout.expects(:flush)
+          $stdin.stubs(:gets).returns("y")
           @app.validate_configuration({})
         end
 
@@ -76,8 +76,8 @@ module MCollective
           Util.expects(:empty_filter?).returns(true)
           @app.stubs(:options).returns({:filter => {}})
           @app.expects(:handle_message).with(:print, 3)
-          STDOUT.expects(:flush)
-          STDIN.stubs(:gets).returns("n")
+          $stdout.expects(:flush)
+          $stdin.stubs(:gets).returns("n")
           @app.expects(:exit).with(1)
           @app.validate_configuration({})
         end
