@@ -58,7 +58,7 @@ module MCollective
 
           it "should invoke the yumHelper.py and process the output" do
             File.stubs(:join).returns("test_yumHelper.py")
-            File.expects(:exists?).with("test_yumHelper.py").returns(true)
+            File.expects(:exist?).with("test_yumHelper.py").returns(true)
             Shell.expects(:new).with("test_yumHelper.py --test_action rspec", :stdout => "").returns(command)
 
             command.expects(:runcommand)
