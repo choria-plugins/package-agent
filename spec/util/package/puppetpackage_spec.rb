@@ -81,7 +81,7 @@ module MCollective
 
         describe '#purge' do
           it 'should purge the package and return the status' do
-            package.stubs(:absent?).returns(false)
+            package.stubs(:purged?).returns(false)
             package.expects(:status).returns(status)
             package.expects(:call_action).with(:purge).returns('the output')
 
@@ -91,7 +91,7 @@ module MCollective
           end
 
           it 'should return a failure message and status if the package is absent' do
-            package.stubs(:absent?).returns(true)
+            package.stubs(:purged?).returns(true)
             package.expects(:status).returns(status)
 
             result = package.purge
