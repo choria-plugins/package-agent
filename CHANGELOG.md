@@ -2,6 +2,12 @@
 
 Change history for `choria/mcollective_agent_package`
 
+## 5.4.0
+
+Released 2021-11-07
+
+ * Run the purge action for uninstalled packages (#25)
+
 ## 5.3.0
 
 Release 2020-07-07
