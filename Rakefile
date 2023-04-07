@@ -1,19 +1,20 @@
 specdir = File.join([File.dirname(__FILE__), "spec"])
 
-require 'rake'
+require "rake"
 begin
-  require 'rspec/core/rake_task'
-  require 'mcollective'
+  require "rspec/core/rake_task"
+  require "mcollective"
 rescue LoadError
+  # Ignore if bundled without tests
 end
 
 desc "Run agent and application tests"
 task :test do
   require "#{specdir}/spec_helper.rb"
   if ENV["TARGETDIR"]
-    test_pattern = "#{File.expand_path(ENV["TARGETDIR"])}/spec/**/*_spec.rb"
+    test_pattern = "#{File.expand_path(ENV['TARGETDIR'])}/spec/**/*_spec.rb"
   else
-    test_pattern = 'spec/**/*_spec.rb'
+    test_pattern = "spec/**/*_spec.rb"
   end
   sh "bundle exec rspec #{Dir.glob(test_pattern).sort.join(' ')}"
 end
@@ -30,7 +31,7 @@ task :readme_expand do
   ddl.instance_eval(File.read(ddl_file))
 
   lines = File.readlines("puppet/README.md").map do |line|
-    if line =~ /^<\!--- actions -->/
+    if /^<!--- actions -->/.match?(line)
       [
         "## Actions\n\n",
         "This agent provides the following actions, for details about each please run `mco plugin doc agent/%s`\n\n" % ddl.meta[:name]

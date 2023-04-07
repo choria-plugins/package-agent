@@ -25,18 +25,18 @@ The ACTION can be one of the following:
     apt_checkupdates - display available updates from apt
     checkupdates     - display available updates
 
-USAGE
+      USAGE
 
       option :yes,
-             :arguments   => ["--yes", "-y"],
+             :arguments => ["--yes", "-y"],
              :description => "Assume yes on any prompts",
-             :type        => :bool
+             :type => :bool
 
       option :version,
-             :arguments   => ["--version VERSION"],
+             :arguments => ["--version VERSION"],
              :description => "Optional VERSION to pass to install",
-             :type        => String,
-             :required    => false
+             :type => String,
+             :required => false
 
       def handle_message(action, message, *args)
         messages = {
@@ -73,9 +73,7 @@ USAGE
 
           if valid_actions.include?(ARGV[0])
             configuration[:action] = ARGV.shift
-            unless valid_global_actions.include?(ARGV[0])
-              configuration[:package] = ARGV.shift
-            end
+            configuration[:package] = ARGV.shift unless valid_global_actions.include?(ARGV[0])
           elsif valid_actions.include?(ARGV[1])
             configuration[:package] = ARGV.shift
             configuration[:action] = ARGV.shift
@@ -86,21 +84,20 @@ USAGE
       end
 
       def validate_configuration(configuration)
-        unless %w[status count md5].include?(configuration[:action])
-          if Util.empty_filter?(options[:filter]) && !configuration[:yes]
-            handle_message(:print, 3)
+        if !%w[status count md5].include?(configuration[:action]) && (Util.empty_filter?(options[:filter]) && !configuration[:yes])
+          handle_message(:print, 3)
 
-            STDOUT.flush
-            exit(1) unless STDIN.gets.strip =~ /^(?:y|yes)$/i
-          end
+          $stdout.flush
+          exit(1) unless /^(?:y|yes)$/i.match?($stdin.gets.strip)
         end
       end
 
       def format_output(pattern, sender_width, result)
-        output = result[:data][:output].gsub("\n", "\n" + " " * (sender_width + 2))
+        output = result[:data][:output].gsub("\n", "\n#{' ' * (sender_width + 2)}")
         pattern % [result[:sender], output]
       end
 
+      # rubocop:disable Metrics/MethodLength, Metrics/BlockNesting
       def main
         pkg = rpcclient("package")
         if configuration[:version].nil?
@@ -142,32 +139,28 @@ USAGE
                 else
                   puts(pattern % [result[:sender], result[:data][:ensure]])
                 end
-              else
-                if configuration[:action] == "status"
-                  case result[:data][:ensure]
-                  when "absent", "purged"
-                    status = result[:data][:ensure]
-                  else
-                    status = '%s-%s' % [result[:data][:name], result[:data][:ensure]]
-                    status += ".#{result[:data][:arch]}" if result[:data][:arch]
-                  end
-                  puts(pattern % [result[:sender], status])
+              elsif configuration[:action] == "status"
+                case result[:data][:ensure]
+                when "absent", "purged"
+                  status = result[:data][:ensure]
                 else
-                  if %w[count md5].include?(configuration[:action])
-                    status = "%s" % [result[:data][:output]]
-                    puts(pattern % [result[:sender], status])
-                  elsif %w[
-                    yum_checkupdates
-                    apt_update
-                    checkupdates
-                    apt_checkupdates
-                  ].include?(configuration[:action])
-                    status = result[:data][:outdated_packages].map do |package|
-                      package[:package]
-                    end.join(" ")
-                    puts(pattern % [result[:sender], status])
-                  end
+                  status = "%s-%s" % [result[:data][:name], result[:data][:ensure]]
+                  status += ".#{result[:data][:arch]}" if result[:data][:arch]
                 end
+                puts(pattern % [result[:sender], status])
+              elsif %w[count md5].include?(configuration[:action])
+                status = "%s" % [result[:data][:output]]
+                puts(pattern % [result[:sender], status])
+              elsif %w[
+                yum_checkupdates
+                apt_update
+                checkupdates
+                apt_checkupdates
+              ].include?(configuration[:action])
+                status = result[:data][:outdated_packages].map do |package|
+                  package[:package]
+                end.join(" ")
+                puts(pattern % [result[:sender], status])
               end
             else
               puts(pattern % [result[:sender], result[:statusmsg]])
@@ -180,6 +173,7 @@ USAGE
         printrpcstats :summarize => true, :caption => "%s Package results" % configuration[:action]
         halt(pkg.stats)
       end
+      # rubocop:enable Metrics/MethodLength, Metrics/BlockNesting
     end
   end
 end
