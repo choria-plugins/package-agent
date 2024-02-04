@@ -2,7 +2,7 @@ metadata    :name        => "package",
             :description => "Manage Operating System Packages",
             :author      => "R.I.Pienaar <rip@devco.net>",
             :license     => "Apache-2.0",
-            :version     => "5.4.0",
+            :version     => "5.4.1",
             :url         => "https://github.com/choria-plugins/package-agent",
             :timeout     => 180
 
