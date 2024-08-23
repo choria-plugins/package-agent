@@ -6,7 +6,7 @@ module MCollective
       query do |package|
         val = {}
         Agent::Package.do_pkg_action(package, :status, val)
-        result[:status] = val[:ensure]
+        result[:status] = val[:ensure] if val[:ensure]
         # If the package is either 'absent' or 'purged' report it as not installed
         result[:installed] = !["absent", "purged"].include?(val[:ensure])
       rescue => e
