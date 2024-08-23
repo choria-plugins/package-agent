@@ -8,30 +8,30 @@ module MCollective
     describe Package_nameValidator do
       describe "#validate" do
         it "should validate a valid package name without errors" do
-          expect {
+          lambda {
             described_class.validate("rspec")
-          }.not_to raise_error
+          }.should_not raise_error
 
-          expect {
+          lambda {
             described_class.validate("rspec1")
-          }.not_to raise_error
+          }.should_not raise_error
 
-          expect {
+          lambda {
             described_class.validate("rspec-package")
-          }.not_to raise_error
+          }.should_not raise_error
 
-          expect {
+          lambda {
             described_class.validate("rspec-package-1")
-          }.not_to raise_error
+          }.should_not raise_error
 
-          expect {
+          lambda {
             described_class.validate("rspec.package")
-          }.not_to raise_error
+          }.should_not raise_error
         end
         it "should fail on a invalid package name" do
-          expect {
+          lambda {
             described_class.validate("rspec!")
-          }.to raise_error
+          }.should raise_error(RuntimeError, "rspec! is not a valid package name")
         end
       end
     end

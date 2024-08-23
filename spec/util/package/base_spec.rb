@@ -18,49 +18,49 @@ module MCollective
 
         describe "install" do
           it "should raise an error if called" do
-            expect {
+            lambda {
               base.install
-            }.to raise_error "error. MCollective::Util::Package::Base does not implement #install"
+            }.should raise_error "error. MCollective::Util::Package::Base does not implement #install"
           end
         end
 
         describe "uninstall" do
           it "should raise an error if called" do
-            expect {
+            lambda {
               base.uninstall
-            }.to raise_error "error. MCollective::Util::Package::Base does not implement #uninstall"
+            }.should raise_error "error. MCollective::Util::Package::Base does not implement #uninstall"
           end
         end
 
         describe "purge" do
           it "should raise an error if called" do
-            expect {
+            lambda {
               base.purge
-            }.to raise_error "error. MCollective::Util::Package::Base does not implement #purge"
+            }.should raise_error "error. MCollective::Util::Package::Base does not implement #purge"
           end
         end
 
         describe "update" do
           it "should raise an error if called" do
-            expect {
+            lambda {
               base.update
-            }.to raise_error "error. MCollective::Util::Package::Base does not implement #update"
+            }.should raise_error "error. MCollective::Util::Package::Base does not implement #update"
           end
         end
 
         describe "status" do
           it "should raise an error if called" do
-            expect {
+            lambda {
               base.status
-            }.to raise_error "error. MCollective::Util::Package::Base does not implement #status"
+            }.should raise_error "error. MCollective::Util::Package::Base does not implement #status"
           end
         end
 
         describe "search" do
           it "should raise an error if called" do
-            expect {
+            lambda {
               base.search
-            }.to raise_error "error. MCollective::Util::Package::Base does not implement #search"
+            }.should raise_error "error. MCollective::Util::Package::Base does not implement #search"
           end
         end
       end

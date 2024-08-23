@@ -254,9 +254,9 @@ module MCollective
 
         it "should log and raise if the provider cannot be loaded" do
           PluginManager.stubs(:loadclass).raises("error")
-          expect {
+          lambda {
             described_class.load_provider_class("rspec")
-          }.to raise_error "Cannot load package provider class 'RspecPackage': error"
+          }.should raise_error "Cannot load package provider class 'RspecPackage': error"
         end
       end
 
@@ -309,9 +309,9 @@ module MCollective
         it "should raise an error if the :msg key is set" do
           reply = {}
           provider.expects(:send, "rspec").returns({:status => {:k1 => "v1", :k2 => "v2"}, :msg => "error"})
-          expect {
+          lambda {
             described_class.do_pkg_action("rspec", "rspec_action", reply)
-          }.to raise_error "error"
+          }.should raise_error "error"
         end
       end
 
