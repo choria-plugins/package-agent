@@ -2,11 +2,11 @@
 source "https://rubygems.org"
 
 group :test do
-  gem "json", "~> 1.8.3"
+  gem "json"
   gem "mcollective-test"
-  gem "mocha", "~> 0.10.0"
-  gem "rake", "~> 10.4"
-  gem "rspec", "~> 2.11.0"
+  gem "mocha"
+  gem "rake"
+  gem "rspec"
   gem "rubocop"
   gem "rubocop-performance"
   gem "rubocop-rake"
