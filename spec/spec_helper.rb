@@ -1,4 +1,5 @@
-$: << File.join([File.dirname(__FILE__), "lib"])
+# Managed by modulesync - DO NOT EDIT
+# https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
 
 require "rubygems"
 require "rspec"
@@ -17,3 +18,5 @@ RSpec.configure do |config|
     MCollective::PluginManager.clear
   end
 end
+
+Dir["./spec/support/spec/**/*.rb"].sort.each { |f| require f }
