@@ -10,16 +10,16 @@ module MCollective
         describe "#yum_clean" do
           it "raises if the yum binary cannot be found" do
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
-            expect {
+            lambda {
               described_class.yum_clean("all")
-            }.to raise_error("Cannot find yum at /usr/bin/yum")
+            }.should raise_error("Cannot find yum at /usr/bin/yum")
           end
 
           it "raises if an unsupported clean mode is supplied" do
             File.expects(:exist?).with("/usr/bin/yum").returns(true)
-            expect {
+            lambda {
               described_class.yum_clean("rspec")
-            }.to raise_error("Unsupported yum clean mode: rspec")
+            }.should raise_error("Unsupported yum clean mode: rspec")
           end
 
           it "raises if the yum command failed" do
@@ -31,9 +31,9 @@ module MCollective
             shell.stubs(:status).returns(status)
             status.stubs(:exitstatus).returns(-1)
 
-            expect {
+            lambda {
               described_class.yum_clean("all")
-            }.to raise_error("Yum clean failed, exit code was -1")
+            }.should raise_error("Yum clean failed, exit code was -1")
           end
 
           it "cleans with the correct clean mode" do
@@ -80,18 +80,18 @@ module MCollective
           it "fails if no compatible package manager is present on the system" do
             described_class.expects(:packagemanager).returns(nil)
 
-            expect {
+            lambda {
               described_class.refresh
-            }.to raise_error "Cannot find a compatible package system to update packages"
+            }.should raise_error "Cannot find a compatible package system to update packages"
           end
         end
 
         describe "#apt_update" do
           it "raises if the apt-get binary cannot be found" do
             File.expects(:exist?).with("/usr/bin/apt-get").returns(false)
-            expect {
+            lambda {
               described_class.apt_update
-            }.to raise_error("Cannot find apt-get at /usr/bin/apt-get")
+            }.should raise_error("Cannot find apt-get at /usr/bin/apt-get")
           end
 
           it "raises if the apt-get command failed" do
@@ -103,9 +103,9 @@ module MCollective
             status.stubs(:exitstatus).returns(-1)
             Shell.expects(:new).with("/usr/bin/apt-get update", :stdout => "").returns(shell)
 
-            expect {
+            lambda {
               described_class.apt_update
-            }.to raise_error "apt-get update failed, exit code was -1"
+            }.should raise_error "apt-get update failed, exit code was -1"
           end
 
           it "performs the update" do
@@ -127,9 +127,9 @@ module MCollective
         describe "#pkg_update" do
           it "raises if the pkg binary cannot be found" do
             File.expects(:exist?).with("/usr/sbin/pkg").returns(false)
-            expect {
+            lambda {
               described_class.pkg_update
-            }.to raise_error("Cannot find pkg at /usr/sbin/pkg")
+            }.should raise_error("Cannot find pkg at /usr/sbin/pkg")
           end
 
           it "raises if the pkg command failed" do
@@ -141,9 +141,9 @@ module MCollective
             status.stubs(:exitstatus).returns(-1)
             Shell.expects(:new).with("/usr/sbin/pkg update", :stdout => "").returns(shell)
 
-            expect {
+            lambda {
               described_class.pkg_update
-            }.to raise_error "pkg update failed, exit code was -1"
+            }.should raise_error "pkg update failed, exit code was -1"
           end
 
           it "performs the update" do
@@ -163,9 +163,9 @@ module MCollective
         describe "#yum_update" do
           it "raises if the yum binary cannot be found" do
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
-            expect {
+            lambda {
               described_class.yum_update
-            }.to raise_error("Cannot find yum at /usr/bin/yum")
+            }.should raise_error("Cannot find yum at /usr/bin/yum")
           end
 
           it "performs the update" do
@@ -182,9 +182,9 @@ module MCollective
         describe "#zypper_update" do
           it "raises if the zypper binary cannot be found" do
             File.expects(:exist?).with("/usr/bin/zypper").returns(false)
-            expect {
+            lambda {
               described_class.zypper_update
-            }.to raise_error("Cannot find zypper at /usr/bin/zypper")
+            }.should raise_error("Cannot find zypper at /usr/bin/zypper")
           end
 
           it "raises if the zypper command failed" do
@@ -196,9 +196,9 @@ module MCollective
             status.stubs(:exitstatus).returns(-1)
             Shell.expects(:new).with("/usr/bin/zypper refresh", :stdout => "").returns(shell)
 
-            expect {
+            lambda {
               described_class.zypper_update
-            }.to raise_error "zypper refresh failed, exit code was -1"
+            }.should raise_error "zypper refresh failed, exit code was -1"
           end
 
           it "performs the update" do
@@ -257,9 +257,9 @@ module MCollective
           it "fails if no compatible package manager is present on the system" do
             described_class.expects(:packagemanager).returns(nil)
 
-            expect {
+            lambda {
               described_class.count
-            }.to raise_error "Cannot find a compatible package system to count packages"
+            }.should raise_error "Cannot find a compatible package system to count packages"
           end
         end
 
@@ -285,9 +285,9 @@ module MCollective
           it "fails if no compatible package manager is present on the system" do
             described_class.expects(:packagemanager).returns(nil)
 
-            expect {
+            lambda {
               described_class.md5
-            }.to raise_error "Cannot find a compatible package system to get a md5 of the package list"
+            }.should raise_error "Cannot find a compatible package system to get a md5 of the package list"
           end
         end
 
@@ -295,9 +295,9 @@ module MCollective
           it "raises if rpm cannot be found on the system" do
             File.expects(:exist?).with("/bin/rpm").returns(false)
 
-            expect {
+            lambda {
               described_class.rpm_count
-            }.to raise_error "Cannot find rpm at /bin/rpm"
+            }.should raise_error "Cannot find rpm at /bin/rpm"
           end
 
           it "raises if the rpm command failed" do
@@ -309,9 +309,9 @@ module MCollective
             status.stubs(:exitstatus).returns(-1)
             Shell.expects(:new).with("/bin/rpm -qa", :stdout => "").returns(shell)
 
-            expect {
+            lambda {
               described_class.rpm_count
-            }.to raise_error "rpm command failed, exit code was -1"
+            }.should raise_error "rpm command failed, exit code was -1"
           end
 
           it "should return the count of packages" do
@@ -337,9 +337,9 @@ module MCollective
           it "raises if rpm cannot be found on the system" do
             File.expects(:exist?).with("/bin/rpm").returns(false)
 
-            expect {
+            lambda {
               described_class.rpm_md5
-            }.to raise_error "Cannot find rpm at /bin/rpm"
+            }.should raise_error "Cannot find rpm at /bin/rpm"
           end
 
           it "raises if the rpm command failed" do
@@ -351,9 +351,9 @@ module MCollective
             status.stubs(:exitstatus).returns(-1)
             Shell.expects(:new).with("/bin/rpm -qa", :stdout => "").returns(shell)
 
-            expect {
+            lambda {
               described_class.rpm_md5
-            }.to raise_error "rpm command failed, exit code was -1"
+            }.should raise_error "rpm command failed, exit code was -1"
           end
 
           it "should return the md5 of packages" do
@@ -379,9 +379,9 @@ module MCollective
           it "raises if dpkg cannot be found on the system" do
             File.expects(:exist?).with("/usr/bin/dpkg").returns(false)
 
-            expect {
+            lambda {
               described_class.dpkg_count
-            }.to raise_error "Cannot find dpkg at /usr/bin/dpkg"
+            }.should raise_error "Cannot find dpkg at /usr/bin/dpkg"
           end
 
           it "raises if the dpkg command failed" do
@@ -393,9 +393,9 @@ module MCollective
             status.stubs(:exitstatus).returns(-1)
             Shell.expects(:new).with("/usr/bin/dpkg --list", :stdout => "").returns(shell)
 
-            expect {
+            lambda {
               described_class.dpkg_count
-            }.to raise_error "dpkg command failed, exit code was -1"
+            }.should raise_error "dpkg command failed, exit code was -1"
           end
 
           it "should return the count of packages" do
@@ -427,9 +427,9 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
           it "raises if dpkg cannot be found on the system" do
             File.expects(:exist?).with("/usr/bin/dpkg").returns(false)
 
-            expect {
+            lambda {
               described_class.dpkg_md5
-            }.to raise_error "Cannot find dpkg at /usr/bin/dpkg"
+            }.should raise_error "Cannot find dpkg at /usr/bin/dpkg"
           end
 
           it "raises if the dpkg command failed" do
@@ -441,9 +441,9 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             status.stubs(:exitstatus).returns(-1)
             Shell.expects(:new).with("/usr/bin/dpkg --list", :stdout => "").returns(shell)
 
-            expect {
+            lambda {
               described_class.dpkg_md5
-            }.to raise_error "dpkg command failed, exit code was -1"
+            }.should raise_error "dpkg command failed, exit code was -1"
           end
 
           it "should return the md5 of packages" do
@@ -475,9 +475,9 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
           it "raises if pkg cannot be found on the system" do
             File.expects(:exist?).with("/usr/sbin/pkg").returns(false)
 
-            expect {
+            lambda {
               described_class.pkg_count
-            }.to raise_error "Cannot find pkg at /usr/sbin/pkg"
+            }.should raise_error "Cannot find pkg at /usr/sbin/pkg"
           end
 
           it "raises if the pkg command failed" do
@@ -489,9 +489,9 @@ ii  account-plugin-aim                                    3.12.11-0ubuntu3      
             status.stubs(:exitstatus).returns(-1)
             Shell.expects(:new).with("/usr/sbin/pkg query '%n'", :stdout => "").returns(shell)
 
-            expect {
+            lambda {
               described_class.pkg_count
-            }.to raise_error "pkg command failed, exit code was -1"
+            }.should raise_error "pkg command failed, exit code was -1"
           end
 
           it "should return the count of packages" do
@@ -517,9 +517,9 @@ rubygem-bolt"
           it "raises if pkg cannot be found on the system" do
             File.expects(:exist?).with("/usr/sbin/pkg").returns(false)
 
-            expect {
+            lambda {
               described_class.pkg_md5
-            }.to raise_error "Cannot find pkg at /usr/sbin/pkg"
+            }.should raise_error "Cannot find pkg at /usr/sbin/pkg"
           end
 
           it "raises if the pkg command failed" do
@@ -531,9 +531,9 @@ rubygem-bolt"
             status.stubs(:exitstatus).returns(-1)
             Shell.expects(:new).with("/usr/sbin/pkg query '%n'", :stdout => "").returns(shell)
 
-            expect {
+            lambda {
               described_class.pkg_md5
-            }.to raise_error "pkg command failed, exit code was -1"
+            }.should raise_error "pkg command failed, exit code was -1"
           end
 
           it "should return the md5 of packages" do
@@ -583,9 +583,9 @@ rubygem-bolt"
           it "fails if no compatible package manager is present on the system" do
             described_class.expects(:packagemanager).returns(nil)
 
-            expect {
+            lambda {
               described_class.checkupdates
-            }.to raise_error "Cannot find a compatible package system to check updates"
+            }.should raise_error "Cannot find a compatible package system to check updates"
           end
         end
 
@@ -593,9 +593,9 @@ rubygem-bolt"
           it "raises if yum cannot be found on the system" do
             File.expects(:exist?).with("/usr/bin/yum").returns(false)
 
-            expect {
+            lambda {
               described_class.yum_checkupdates
-            }.to raise_error "Cannot find yum at /usr/bin/yum"
+            }.should raise_error "Cannot find yum at /usr/bin/yum"
           end
 
           it "should return the list of outdated packages" do
@@ -623,9 +623,9 @@ rubygem-bolt"
           it "raises if zypper cannot be foud on the system" do
             File.expects(:exist?).with("/usr/bin/zypper").returns(false)
 
-            expect {
+            lambda {
               described_class.zypper_checkupdates
-            }.to raise_error "Cannot find zypper at /usr/bin/zypper"
+            }.should raise_error "Cannot find zypper at /usr/bin/zypper"
           end
 
           it "should return the list of outdated packages" do
@@ -655,9 +655,9 @@ rubygem-bolt"
           it "raises if apt cannot be found on the system" do
             File.expects(:exist?).with("/usr/bin/apt-get").returns(false)
 
-            expect {
+            lambda {
               described_class.apt_checkupdates
-            }.to raise_error "Cannot find apt-get at /usr/bin/apt-get"
+            }.should raise_error "Cannot find apt-get at /usr/bin/apt-get"
           end
 
           it "raises if the check-update command failed" do
@@ -669,9 +669,9 @@ rubygem-bolt"
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(-1)
 
-            expect {
+            lambda {
               described_class.apt_checkupdates
-            }.to raise_error "Apt check-update failed, exit code was -1"
+            }.should raise_error "Apt check-update failed, exit code was -1"
           end
 
           it "should return the list of outdated packages" do
@@ -698,9 +698,9 @@ rubygem-bolt"
           it "raises if pkg cannot be found on the system" do
             File.expects(:exist?).with("/usr/sbin/pkg").returns(false)
 
-            expect {
+            lambda {
               described_class.pkg_checkupdates
-            }.to raise_error "Cannot find pkg at /usr/sbin/pkg"
+            }.should raise_error "Cannot find pkg at /usr/sbin/pkg"
           end
 
           it "raises if the query command failed" do
@@ -712,9 +712,9 @@ rubygem-bolt"
             shell.expects(:status).returns(status)
             status.stubs(:exitstatus).returns(-1)
 
-            expect {
+            lambda {
               described_class.pkg_checkupdates
-            }.to raise_error "pkg query failed, exit code was -1"
+            }.should raise_error "pkg query failed, exit code was -1"
           end
 
           it "raises if the rquery command failed" do
@@ -732,9 +732,9 @@ rubygem-bolt"
             rquery_shell.expects(:status).returns(rquery_status)
             rquery_status.stubs(:exitstatus).returns(-1)
 
-            expect {
+            lambda {
               described_class.pkg_checkupdates
-            }.to raise_error "pkg rquery failed, exit code was -1"
+            }.should raise_error "pkg rquery failed, exit code was -1"
           end
 
           it "should return the list of outdated packages" do

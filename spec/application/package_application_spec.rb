@@ -20,23 +20,23 @@ module MCollective
       describe "#post_option_parser" do
         it "should fail if both an action and package are not supplied" do
           ARGV << "rspec"
-          expect {
+          lambda {
             @app.post_option_parser({})
-          }.to raise_error "Please specify package name and action"
+          }.should raise_error "Please specify package name and action"
 
           ARGV.shift
-          expect {
+          lambda {
             @app.post_option_parser({})
-          }.to raise_error "Please specify package name and action"
+          }.should raise_error "Please specify package name and action"
         end
 
         it "should fail on an unknown action" do
           ARGV << "rspec"
           ARGV << "rspec"
 
-          expect {
+          lambda {
             @app.post_option_parser({})
-          }.to raise_error "Action has to be one of install, uninstall, purge, update, status, search, count, md5, yum_clean, yum_checkupdates, apt_update, checkupdates, apt_checkupdates, refresh"
+          }.should raise_error "Action has to be one of install, uninstall, purge, update, status, search, count, md5, yum_clean, yum_checkupdates, apt_update, checkupdates, apt_checkupdates, refresh"
         end
 
         it 'should parse "action" "package" correctly' do

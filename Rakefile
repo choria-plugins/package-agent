@@ -1,11 +1,18 @@
+# Managed by modulesync - DO NOT EDIT
+# https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
+
 specdir = File.join([File.dirname(__FILE__), "spec"])
 
 require "rake"
 begin
   require "rspec/core/rake_task"
   require "mcollective"
-rescue LoadError
-  # Ignore if bundled without tests
+rescue LoadError # rubocop:disable Lint/SuppressedException
+end
+
+desc "Run rubycop style checks"
+task :rubocop do
+  sh("rubocop")
 end
 
 desc "Run agent and application tests"
@@ -19,11 +26,11 @@ task :test do
   sh "bundle exec rspec #{Dir.glob(test_pattern).sort.join(' ')}"
 end
 
-task :default => :test
+task :default => [:rubocop, :test]
 
 desc "Expands the action details section in a README.md file"
 task :readme_expand do
-  ddl_file = Dir.glob(File.join("agent/*.ddl")).first
+  ddl_file = Dir.glob("agent/*.ddl").first
 
   return unless ddl_file
 
@@ -31,7 +38,7 @@ task :readme_expand do
   ddl.instance_eval(File.read(ddl_file))
 
   lines = File.readlines("puppet/README.md").map do |line|
-    if /^<!--- actions -->/.match?(line)
+    if line.match?(/^<!--- actions -->/)
       [
         "## Actions\n\n",
         "This agent provides the following actions, for details about each please run `mco plugin doc agent/%s`\n\n" % ddl.meta[:name]
@@ -76,5 +83,5 @@ end
 
 desc "Builds the module found in the current directory, run build_prep first"
 task :build do
-  sh "/opt/puppetlabs/puppet/bin/mco plugin package --vendor choria"
+  sh "/opt/puppetlabs/puppet/bin/mco plugin package --format aiomodulepackage --vendor choria"
 end

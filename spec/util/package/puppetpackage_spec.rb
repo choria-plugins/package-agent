@@ -159,12 +159,12 @@ module MCollective
         describe "#absent?" do
           it "should return true if the package is absent" do
             provider.stubs(:properties).returns(:ensure => :absent)
-            package.send(:absent?).should be_true
+            package.send(:absent?).should be_truthy
           end
 
           it "should return false if the package is present" do
             provider.stubs(:properties).returns(:ensure => "xx-xx-xx")
-            package.send(:absent?).should be_false
+            package.send(:absent?).should be_falsey
           end
         end
 
