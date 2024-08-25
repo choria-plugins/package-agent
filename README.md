@@ -6,7 +6,24 @@ status of packages on your system.
 This agent can be extended to support different Package managers, by default it
 uses Puppet.  See the section later in this document about extendibility.
 
-<!--- actions -->
+## Actions
+
+This agent provides the following actions, for details about each please run `mco plugin doc agent/package`
+
+ * **apt_checkupdates** - Check for APT updates
+ * **apt_update** - Update the apt cache
+ * **checkupdates** - Check for updates
+ * **count** - Get number of packages installed
+ * **install** - Install a package
+ * **md5** - Get md5 digest of list of packages installed
+ * **purge** - Purge a package
+ * **refresh** - Update the available packages cache
+ * **search** - Search package manager for package availability
+ * **status** - Get the status of a package
+ * **uninstall** - Uninstall a package
+ * **update** - Update a package
+ * **yum_checkupdates** - Check for YUM updates
+ * **yum_clean** - Clean the YUM cache
 
 ## Installation
 

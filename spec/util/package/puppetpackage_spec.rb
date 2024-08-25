@@ -1,8 +1,8 @@
 #!/usr/bin/env rspec
 
 require "spec_helper"
-require File.join(File.dirname(__FILE__), "../../../", "util", "package", "base.rb")
-require File.join(File.dirname(__FILE__), "../../../", "util", "package", "puppetpackage.rb")
+require File.join(File.dirname(__FILE__), "../../../",  "files", "mcollective", "util", "package", "base.rb")
+require File.join(File.dirname(__FILE__), "../../../",  "files", "mcollective", "util", "package", "puppetpackage.rb")
 
 module MCollective
   module Util
