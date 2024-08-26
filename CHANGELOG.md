@@ -2,6 +2,12 @@
 
 Change history for `choria/mcollective_agent_package`
 
+## 5.5.1
+
+Released 2024-08-26
+
+ * Support latest ruby and use new module layout
+
 ## 5.4.1
 
 Release 2024-02-04
