@@ -1,15 +1,19 @@
-#!ruby
+# Managed by modulesync - DO NOT EDIT
+# https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
+
 source "https://rubygems.org"
 
 group :test do
-  gem "json"
-  gem "mcollective-test"
-  gem "mocha"
-  gem "rake"
-  gem "rspec"
-  gem "rubocop"
-  gem "rubocop-performance"
-  gem "rubocop-rake"
+  gem "mcollective-test",    :require => false
+  gem "mocha",               :require => false
+  gem "rake",                :require => false
+  gem "rspec",               :require => false
+  gem "rubocop-performance", :require => false
+  gem "rubocop-rake",        :require => false
+end
+
+group :release do
+  gem "voxpupuli-release", "~> 3.0", :require => false
 end
 
 mcollective_version = ENV["MCOLLECTIVE_GEM_VERSION"]

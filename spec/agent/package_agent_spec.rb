@@ -1,7 +1,7 @@
 #!/usr/bin/env rspec
 
 require "spec_helper"
-require File.join(File.dirname(__FILE__), "../../", "agent", "package.rb")
+require File.join(File.dirname(__FILE__), "../../", "files", "mcollective", "agent", "package.rb")
 
 module MCollective
   module Agent
@@ -9,7 +9,7 @@ module MCollective
       let(:provider) { mock }
 
       before do
-        agent_file = File.join(File.dirname(__FILE__), "../../", "agent", "package.rb")
+        agent_file = File.join(File.dirname(__FILE__), "../../",  "files", "mcollective", "agent", "package.rb")
         @agent = MCollective::Test::LocalAgentTest.new("package", :agent_file => agent_file).plugin
         described_class.stubs(:load_provider_class).returns(provider)
         provider.stubs(:new).returns(provider)

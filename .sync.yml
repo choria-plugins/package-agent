@@ -1,0 +1,5 @@
+Gemfile:
+  optional:
+    ':test':
+      - gem: rubocop-performance
+      - gem: rubocop-rake
