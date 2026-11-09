@@ -84,7 +84,7 @@ The ACTION can be one of the following:
       end
 
       def validate_configuration(configuration)
-        if !%w[status count md5].include?(configuration[:action]) && (Util.empty_filter?(options[:filter]) && !configuration[:yes])
+        if !%w[status count md5].include?(configuration[:action]) && Util.empty_filter?(options[:filter]) && !configuration[:yes]
           handle_message(:print, 3)
 
           $stdout.flush
